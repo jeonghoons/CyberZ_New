@@ -1,0 +1,60 @@
+# 👉 Visual Studio 관련
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+# 👉 빌드 결과물 (Debug, Release 등)
+Debug/
+Release/
+x64/
+x86/
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.log
+
+# 👉 CMake 관련 (사용하는 경우)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# 👉 백업 및 임시 파일
+*.tmp
+*.bak
+*.old
+*.cache
+*.db
+
+# 👉 OS에서 생성하는 불필요한 파일
+Thumbs.db
+ehthumbs.db
+.DS_Store
+desktop.ini
+
+# 👉 로그, 덤프 등
+*.log
+*.dmp
+*.dump
+*.trace
+
+# 👉 설정 파일 (선택적으로 무시)
+*.opensdf
+*.tlog
+*.idb
+*.ipch
+
+# 👉 프로젝트 빌드 폴더 (직접 만든 경우)
+build/
+out/
+bin/
+
+# 👉 Git 무시 설정 파일 자체는 추적
+!.gitignore
