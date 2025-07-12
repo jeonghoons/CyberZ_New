@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "thread"
 #include "ServerService.h"
+#include "IocpCore.h"
 
 void worker_thread(shared_ptr<ServerService>& service)
 {
@@ -24,7 +25,7 @@ int main()
 
 
 	vector<thread> _threads;
-	int num_threads = 4;
+	int num_threads = 1;
 	for (int i = 0; i < num_threads; ++i) {
 		_threads.emplace_back(worker_thread, std::ref(service));
 	}

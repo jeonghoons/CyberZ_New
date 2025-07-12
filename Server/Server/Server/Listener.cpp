@@ -7,12 +7,12 @@
 
 Listener::~Listener()
 {
-	::closesocket(listenSocket);
+	::closesocket(_listenSocket);
 }
 
 HANDLE Listener::GetHandle()
 {
-	return reinterpret_cast<HANDLE>(listenSocket);
+	return reinterpret_cast<HANDLE>(_listenSocket);
 }
 
 void Listener::Dispatch(class IocpEvent* iocpEvent, int numBytes)
@@ -30,17 +30,17 @@ bool Listener::StartAccept(shared_ptr<ServerService> service)
 	if (_service == nullptr)
 		return false;
 
-	listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (listenSocket == INVALID_SOCKET)
+	_listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (_listenSocket == INVALID_SOCKET)
 		return false;
 
 	if (_service->GetIocpInstance()->Register(shared_from_this()) == false)
 		return false;
 	
-	if (SOCKET_ERROR == ::bind(listenSocket, reinterpret_cast<SOCKADDR*>(&_service->GetNetAddress().GetSockAddr()), sizeof(SOCKADDR)))
+	if (SOCKET_ERROR == ::bind(_listenSocket, reinterpret_cast<SOCKADDR*>(&_service->GetNetAddress().GetSockAddr()), sizeof(SOCKADDR)))
 		return false;
 
-	if (SOCKET_ERROR == ::listen(listenSocket, SOMAXCONN))
+	if (SOCKET_ERROR == ::listen(_listenSocket, SOMAXCONN))
 		return false;
 
 	_acceptOver = new AcceptEvent();
@@ -57,7 +57,7 @@ void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 	_acceptOver->_session = session;
 
 	DWORD num_bytes{};
-	if (false == AcceptEx(listenSocket, session->GetSocket(), session->_recvBuffer.WritePos(), 0,
+	if (false == AcceptEx(_listenSocket, session->GetSocket(), session->_recvBuffer.WritePos(), 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, &num_bytes, static_cast<LPOVERLAPPED>(acceptEvent)))
 	{
 		const int errorCode = ::WSAGetLastError();
@@ -74,7 +74,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	shared_ptr<Session> session = acceptEvent->_session;
 
 	::setsockopt(session->GetSocket(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
-		(char*)&listenSocket, sizeof(listenSocket));
+		(char*)&_listenSocket, sizeof(_listenSocket));
 
 	SOCKADDR_IN sockAddress;
 	int sizeOfSockAddr = sizeof(sockAddress);

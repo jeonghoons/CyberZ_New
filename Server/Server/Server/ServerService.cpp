@@ -18,6 +18,8 @@ ServerService::~ServerService()
 bool ServerService::Start()
 {
 	_listener = make_shared<Listener>();
+	if (_listener == nullptr)
+		return false;
 
 	shared_ptr<ServerService> service = static_pointer_cast<ServerService>(shared_from_this());
 	if (_listener->StartAccept(service) == false)

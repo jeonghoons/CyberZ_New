@@ -17,6 +17,7 @@ using namespace std;
 #include <queue>
 #include <chrono>
 #include <unordered_map>
+#include <thread>
 
 extern thread_local unsigned int Lthreadid;
 

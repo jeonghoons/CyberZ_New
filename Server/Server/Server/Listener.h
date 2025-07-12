@@ -24,7 +24,7 @@ private:
 	void ProcessAccept(AcceptEvent* acceptEvent);
 
 private:
-	SOCKET listenSocket;
+	SOCKET _listenSocket;
 	SOCKET clientSocket;
 	
 	shared_ptr<ServerService> _service;
