@@ -8,6 +8,7 @@
 Listener::~Listener()
 {
 	::closesocket(_listenSocket);
+	delete _acceptOver;
 }
 
 HANDLE Listener::GetHandle()
@@ -80,11 +81,12 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	int sizeOfSockAddr = sizeof(sockAddress);
 	if (SOCKET_ERROR == ::getpeername(session->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddress), &sizeOfSockAddr))
 	{
-		const int errorCode = ::WSAGetLastError();
 		RegisterAccept(acceptEvent);
 		return;
 	}
 
+	session->SetNetAddress(NetAddress(sockAddress));
+	session->OnConnected();
 
 
 	cout << "Client Connected " << endl;

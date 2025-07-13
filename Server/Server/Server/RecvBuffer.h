@@ -10,6 +10,7 @@ public:
 	
 	BYTE* ReadPos() { return &_buffer[_readPos]; }
 	BYTE* WritePos() { return &_buffer[_writePos]; }
+	int BufferSize() { return _buffer.size(); }
 	
 private:
 	int		_readPos = 0;

@@ -1,6 +1,8 @@
 #pragma once
 #include "RecvBuffer.h"
 #include "IocpCore.h"
+#include "NetAddress.h"
+#include "IocpEvent.h"
 
 class ServerService;
 
@@ -17,13 +19,29 @@ public:
 
 public:
 	void		SetService(shared_ptr<ServerService> service) { _service = service; }
+	shared_ptr<ServerService> GetService() { return _service.lock(); }
 	SOCKET	GetSocket() { return _socket; }
+	void		SetNetAddress(NetAddress address) { _netAddress = address; }
+	bool		IsConnected() { return _connected; }
 
-	 
+public:
+	virtual void		OnConnected();
+
+private:
+	void			RegisterRecv();
+	void			ProcessRecv(int numOfBytes);
+
+public:
 	RecvBuffer	_recvBuffer;
 private:
 	weak_ptr<ServerService> _service;
 	SOCKET _socket;
-		
+	NetAddress		_netAddress = {};
+	atomic<bool>		_connected = false;
+
+	RecvEvent		_recvEvent;
+	SendEvent		_sendEvent;
+
+
 };
 

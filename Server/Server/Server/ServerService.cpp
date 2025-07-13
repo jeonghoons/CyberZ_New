@@ -36,17 +36,18 @@ shared_ptr<Session> ServerService::CreateSession()
 	if (_iocpCore->Register(session) == false)
 		return nullptr;
 
-
-
 	return session;
 }
 
 void ServerService::AddSession(shared_ptr<Session> session)
 {
-	
+	lock_guard lock(_lock);
+	_sessions.emplace_back(session);
 }
 
 void ServerService::ReleaseSession(shared_ptr<Session> session)
 {
+	lock_guard lock(_lock);
+
 
 }

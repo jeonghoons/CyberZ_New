@@ -9,7 +9,7 @@ void HandleError(const char* cause)
 
 int main()
 {
-	this_thread::sleep_for(1s);
+	// this_thread::sleep_for(3s);
 	WSADATA wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 		printf("WSAStartup failed with error: %d\n", WSAGetLastError());

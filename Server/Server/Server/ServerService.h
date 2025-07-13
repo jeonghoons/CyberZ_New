@@ -24,7 +24,8 @@ private:
 	NetAddress				_netAddress;
 	shared_ptr<IocpCore>		_iocpCore;
 
-	unordered_map<int, shared_ptr<Session>> _sessions;
+	mutex					_lock;
+	vector<shared_ptr<Session>> _sessions;
 
 };
 
