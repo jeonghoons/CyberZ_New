@@ -6,6 +6,12 @@
 
 class ServerService;
 
+struct PacketHeader
+{
+	unsigned short size;
+	unsigned short type;
+};
+
 class Session : public IocpObject
 {
 	
@@ -27,12 +33,18 @@ public:
 public:
 	virtual void		OnConnected();
 
+	int			ProcessData(BYTE* buffer, int len);
+	void			ProcessPacket(BYTE* buffer, int len);
+
 private:
 	void			RegisterRecv();
 	void			ProcessRecv(int numOfBytes);
 
+	void			DoSend();
+
 public:
 	RecvBuffer	_recvBuffer;
+	char			_sendBuffer[1024];
 private:
 	weak_ptr<ServerService> _service;
 	SOCKET _socket;
@@ -41,7 +53,6 @@ private:
 
 	RecvEvent		_recvEvent;
 	SendEvent		_sendEvent;
-
 
 };
 

@@ -1,4 +1,5 @@
 #include "..//Server/pch.h"
+#include "string"
 
 void HandleError(const char* cause)
 {
@@ -44,7 +45,7 @@ int main()
 
 	cout << "Connected to Server" << endl;
 
-	char sendBuffer[100] = "Hello World";
+	string sendBuffer = "Hello World";
 	WSAEVENT wsaEvent = ::WSACreateEvent();
 	WSAOVERLAPPED overlapped = {};
 	overlapped.hEvent = wsaEvent;
@@ -53,12 +54,8 @@ int main()
 	while (true)
 	{
 		WSABUF wsaBuf;
-		wsaBuf.buf = sendBuffer;
-		wsaBuf.len = 100;
-
-
-
-
+		wsaBuf.buf = reinterpret_cast<char*>(&sendBuffer);
+		wsaBuf.len = sendBuffer.length();
 
 
 		DWORD sendLen = 0;
@@ -87,7 +84,7 @@ int main()
 
 		}
 
-		cout << "Send Data ! Len = " << sizeof(sendBuffer) << endl;
+		cout << "Send Data ! Len = " << sendLen << endl;
 
 		this_thread::sleep_for(1s);
 	}
