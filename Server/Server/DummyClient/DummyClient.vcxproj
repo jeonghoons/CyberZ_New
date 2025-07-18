@@ -127,7 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Server\RecvBuffer.cpp" />
     <ClCompile Include="dummyClientMain.cpp" />
+    <ClCompile Include="Network.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Server\RecvBuffer.h" />
+    <ClInclude Include="Network.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

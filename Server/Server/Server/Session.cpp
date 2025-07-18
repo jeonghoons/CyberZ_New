@@ -30,6 +30,7 @@ void Session::Dispatch(IocpEvent* iocpEvent, int numBytes)
 		ProcessRecv(numBytes);
 		break;
 	case EventType::Send:
+		ProcessSend(numBytes);
 		break;
 
 	default:
@@ -45,6 +46,16 @@ void Session::OnConnected()
 	GetService()->AddSession(static_pointer_cast<Session>(shared_from_this()));
 	
 	RegisterRecv();
+}
+
+void Session::Disconnect(const WCHAR* cause)
+{
+	if (_connected.exchange(false) == false)
+		return;
+
+	GetService()->ReleaseSession(static_pointer_cast<Session>(shared_from_this()));
+
+	wcout << "DisConnect :" << cause << endl;
 }
 
 int Session::ProcessData(BYTE* buffer, int len)
@@ -107,6 +118,7 @@ void Session::ProcessRecv(int numOfBytes)
 
 	cout << "Recv " << numOfBytes << " Bytes" << endl;
 	if (numOfBytes == 0) {
+		Disconnect(L"Recv 0");
 		return;
 	}
 
@@ -119,7 +131,7 @@ void Session::ProcessRecv(int numOfBytes)
 	int processLen = ProcessData(_recvBuffer.ReadPos(), dataSize);
 	if (_recvBuffer.OnRead(processLen) == false)
 	{
-		// DisConnect(L"OnRead Overflow");
+		Disconnect(L"Recv Buffer Overflow");
 		return;
 	}
 
@@ -128,7 +140,7 @@ void Session::ProcessRecv(int numOfBytes)
 	RegisterRecv();
 }
 
-void Session::DoSend()
+void Session::RegisterSend()
 {
 	if (IsConnected() == false)
 		return;
@@ -148,6 +160,18 @@ void Session::DoSend()
 		{
 			_sendEvent.owner = nullptr; // Release REF
 		}
+	}
+}
+
+void Session::ProcessSend(int numOfBytes)
+{
+	_sendEvent.owner = nullptr;
+	ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
+
+	if (numOfBytes == 0)
+	{
+		Disconnect(L"Send 0");
+		return;
 	}
 }
 

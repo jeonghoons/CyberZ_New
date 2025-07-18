@@ -4,6 +4,7 @@
 class RecvBuffer
 {
 public:
+	RecvBuffer() = default;
 	RecvBuffer(int bufferSize);
 	~RecvBuffer();
 	

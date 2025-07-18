@@ -6,11 +6,6 @@
 
 class ServerService;
 
-struct PacketHeader
-{
-	unsigned short size;
-	unsigned short type;
-};
 
 class Session : public IocpObject
 {
@@ -31,7 +26,8 @@ public:
 	bool		IsConnected() { return _connected; }
 
 public:
-	virtual void		OnConnected();
+	virtual void	OnConnected();
+	void			Disconnect(const WCHAR* cause);
 
 	int			ProcessData(BYTE* buffer, int len);
 	void			ProcessPacket(BYTE* buffer, int len);
@@ -40,7 +36,8 @@ private:
 	void			RegisterRecv();
 	void			ProcessRecv(int numOfBytes);
 
-	void			DoSend();
+	void			RegisterSend();
+	void			ProcessSend(int numOfBytes);
 
 public:
 	RecvBuffer	_recvBuffer;

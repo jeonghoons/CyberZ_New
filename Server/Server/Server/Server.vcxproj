@@ -148,6 +148,7 @@
     <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="ServerService.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="TestProtocol.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gameserver.cpp" />

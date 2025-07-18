@@ -48,6 +48,13 @@ void ServerService::AddSession(shared_ptr<Session> session)
 void ServerService::ReleaseSession(shared_ptr<Session> session)
 {
 	lock_guard lock(_lock);
+	auto it = find(_sessions.begin(), _sessions.end(), session);
+	if (it == _sessions.end()) {
+		cout << "Error" << endl;
+	}
+	else {
+		_sessions.erase(it);
+	}
 
 
 }

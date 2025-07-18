@@ -10,6 +10,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{d6629dd8-7332-46f2-9d5e-f0a27a7dc4cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocol">
+      <UniqueIdentifier>{e5844e9b-d64a-48d1-86ff-2d303e6653ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="NetAddress.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="TestProtocol.h">
+      <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

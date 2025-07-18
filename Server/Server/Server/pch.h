@@ -22,6 +22,7 @@ using namespace std;
 
 extern thread_local unsigned int Lthreadid;
 
+#include "TestProtocol.h"
 #define PORT_NUM 8888
 
 

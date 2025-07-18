@@ -1,5 +1,6 @@
-#include "..//Server/pch.h"
-#include "string"
+﻿// #include "..//Server/pch.h"
+#include "Network.h"
+
 
 void HandleError(const char* cause)
 {
@@ -7,31 +8,14 @@ void HandleError(const char* cause)
 	cout << cause << " ErrorCode : " << errCode << endl;
 }
 
+static const int   TARGET_FPS = 60;           // 목표 FPS
 
 int main()
 {
 	// this_thread::sleep_for(3s);
-	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-		printf("WSAStartup failed with error: %d\n", WSAGetLastError());
-		exit(-1);
-	}
+	
 
-	SOCKET clientSocket = ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (clientSocket == INVALID_SOCKET)
-		return 0;
-
-	unsigned long on = 1;
-	if (::ioctlsocket(clientSocket, FIONBIO, &on) == INVALID_SOCKET)
-		return 0;
-
-	SOCKADDR_IN serverAddr;
-	::memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	::inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
-	serverAddr.sin_port = ::htons(PORT_NUM);
-
-	while (true)
+	/*while (true)
 	{
 		if (::connect(clientSocket, (SOCKADDR*)(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
@@ -41,52 +25,71 @@ int main()
 				break;
 			break;
 		}
-	}
+	}*/
+
+	Network network;
+	if (network.Connect2Server() == false)
+		exit(-1);
 
 	cout << "Connected to Server" << endl;
 
-	string sendBuffer = "Hello World";
-	WSAEVENT wsaEvent = ::WSACreateEvent();
-	WSAOVERLAPPED overlapped = {};
-	overlapped.hEvent = wsaEvent;
+	std::thread inputThread([&network]() {
+		while (true)
+		{
+			std::string chatMessage;
+			std::getline(std::cin, chatMessage);
+			if (chatMessage.empty()) continue;
 
-	// Send
+			// int sent = send(clientSocket, chatMessage.c_str(), static_cast<int>(chatMessage.size()), 0);
+			
+			
+			CS_CHAT_PACKET packet;
+			packet.Message = { chatMessage };
+			packet.header.size = packet.Message.length() + sizeof(PacketHeader);
+			packet.header.type = CS_PACKET_LIST::CS_CHAT;
+
+			network.Send_packet(&packet);
+			/*if (sent == SOCKET_ERROR)
+			{
+				std::cerr << "[전송 오류] 서버에 메시지를 보낼 수 없습니다.\n";
+				break;
+			}*/
+		}
+		});
+
+	// 4) 메인 루프 (60 FPS) ------------------------------------------------
+	using clock = std::chrono::high_resolution_clock;
+	using duration = clock::duration;
+	auto nextFrame = clock::now();
+	static const duration FRAME_TIME = std::chrono::duration_cast<duration>(std::chrono::duration<double>(1.0 / TARGET_FPS));
+
+
 	while (true)
 	{
-		WSABUF wsaBuf;
-		wsaBuf.buf = reinterpret_cast<char*>(&sendBuffer);
-		wsaBuf.len = sendBuffer.length();
+		const auto frameStart = clock::now();
 
 
-		DWORD sendLen = 0;
-		DWORD flags = 0;
-		if (::WSASend(clientSocket, &wsaBuf, 1, &sendLen, flags, &overlapped, nullptr) == SOCKET_ERROR)
-
-		{
-			if (::WSAGetLastError() == WSA_IO_PENDING)
-
-
-			{
-				// Pending
-				::WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
-				::WSAGetOverlappedResult(clientSocket, &overlapped, &sendLen, FALSE, &flags);
-
-
-
-			}
-			else
-			{
-				// ��¥ ���� �ִ� ��Ȳ
-				break;
-			}
-
-
-
+		// 프레임 유지
+		while (clock::now() - frameStart < FRAME_TIME) {
+			// 실제 게임 클라이언트와 유사하게 sleep 없이 루프를 유지합니다.
 		}
 
-		cout << "Send Data ! Len = " << sendLen << endl;
+		nextFrame = frameStart;
 
-		this_thread::sleep_for(1s);
+		// FPS 출력 (1초마다)
+		static int fpsCounter = 0;
+		++fpsCounter;
+		static auto lastFpsReport = frameStart;
+		if (frameStart - lastFpsReport >= std::chrono::seconds(1))
+		{
+			network.RecvPacket();
+			// std::cout << "FPS: " << fpsCounter << "\n";
+			fpsCounter = 0;
+			lastFpsReport = frameStart;
+		}
 	}
 
+	inputThread.detach();  // 입력 스레드 분리 종료
+	
+	return 0;
 }
