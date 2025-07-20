@@ -4,6 +4,8 @@
 class ServerService;
 class AcceptEvent;
 
+
+
 class Listener : public IocpObject
 {
 	
@@ -22,10 +24,11 @@ public:
 private:
 	void RegisterAccept(AcceptEvent* acceptEvent);
 	void ProcessAccept(AcceptEvent* acceptEvent);
+	int  IdGenerate() { return _clientId++; }
 
 private:
 	SOCKET _listenSocket;
-	SOCKET clientSocket;
+	atomic<int> _clientId = 100;
 	
 	shared_ptr<ServerService> _service;
 	AcceptEvent*  _acceptOver;

@@ -42,6 +42,9 @@
     <ClCompile Include="NetAddress.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -69,6 +72,9 @@
       <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="TestProtocol.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler.h">
       <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>

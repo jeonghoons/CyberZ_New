@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Session.h"
 #include "ServerService.h"
+#include "PacketHandler.h"
 
 Session::Session() : _recvBuffer(65536)
 {
@@ -42,6 +43,7 @@ void Session::Dispatch(IocpEvent* iocpEvent, int numBytes)
 void Session::OnConnected()
 {
 	_connected.store(true);
+	cout << "Client[" << _cid << "] Connected " << endl;
 
 	GetService()->AddSession(static_pointer_cast<Session>(shared_from_this()));
 	
@@ -83,6 +85,11 @@ int Session::ProcessData(BYTE* buffer, int len)
 
 void Session::ProcessPacket(BYTE* buffer, int len)
 {
+	shared_ptr<Session> session = static_pointer_cast<Session>(shared_from_this());
+	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+
+	PacketHandler::HandlerPacket(session, buffer, len);
+
 }
 
 void Session::RegisterRecv()

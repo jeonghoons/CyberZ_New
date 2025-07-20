@@ -24,6 +24,8 @@ public:
 	SOCKET	GetSocket() { return _socket; }
 	void		SetNetAddress(NetAddress address) { _netAddress = address; }
 	bool		IsConnected() { return _connected; }
+	void		SetId(int num) { _cid = num; }
+	int		GetId() { return _cid; }
 
 public:
 	virtual void	OnConnected();
@@ -42,11 +44,14 @@ private:
 public:
 	RecvBuffer	_recvBuffer;
 	char			_sendBuffer[1024];
+
+
 private:
 	weak_ptr<ServerService> _service;
 	SOCKET _socket;
 	NetAddress		_netAddress = {};
 	atomic<bool>		_connected = false;
+	unsigned int		_cid{};
 
 	RecvEvent		_recvEvent;
 	SendEvent		_sendEvent;
