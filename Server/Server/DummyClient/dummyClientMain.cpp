@@ -31,24 +31,26 @@ int main()
 	if (network.Connect2Server() == false)
 		exit(-1);
 
+	
 	cout << "Connected to Server" << endl;
 
 	std::thread inputThread([&network]() {
 		while (true)
 		{
-			std::string chatMessage;
-			std::getline(std::cin, chatMessage);
-			if (chatMessage.empty()) continue;
+			std::string input;
+			std::getline(std::cin, input);
+			if (input.empty()) continue;
 
 			// int sent = send(clientSocket, chatMessage.c_str(), static_cast<int>(chatMessage.size()), 0);
 			
 			
 			CS_CHAT_PACKET packet;
-			packet.Message = { chatMessage };
-			packet.header.size = packet.Message.length() + sizeof(PacketHeader);
-			packet.header.type = CS_PACKET_LIST::CS_CHAT;
-
+			strncpy_s(packet.message, input.c_str(), sizeof(packet.message) - 1);
+			packet.message[sizeof(packet.message) - 1] = '\0';  // 널 종료 보장
+			packet.header.size = static_cast<uint16_t>(std::strlen(packet.message) + sizeof(PacketHeader));
+			packet.header.type = CS_CHAT;
 			network.Send_packet(&packet);
+
 			/*if (sent == SOCKET_ERROR)
 			{
 				std::cerr << "[전송 오류] 서버에 메시지를 보낼 수 없습니다.\n";
