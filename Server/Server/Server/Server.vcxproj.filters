@@ -45,6 +45,9 @@
     <ClCompile Include="PacketHandler.cpp">
       <Filter>Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="SendBuffer.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="PacketHandler.h">
       <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBuffer.h">
+      <Filter>NetWork</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

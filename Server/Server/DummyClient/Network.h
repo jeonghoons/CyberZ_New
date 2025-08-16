@@ -26,7 +26,7 @@ public:
 
 		if (len > 0) {
 			// process_data(wsabuf.buf, recv_byte);
-			cout << sent << "Bytes Recv" << endl;
+			cout << len << "Bytes Recv" << endl;
 		}
 		return len;
 	}

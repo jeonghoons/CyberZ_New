@@ -15,6 +15,16 @@ bool Handle_CS_CHAT(shared_ptr<Session> session, CS_CHAT_PACKET* packet)
 	char message[1024] = { '\0', };
 	memcpy(message, packet->message, packet->header.size - sizeof(PacketHeader));
 	cout << "Client [" << session->GetId() << "] : " << message << endl;
+	
+
+
+	SC_CHAT_PACKET cPacket;
+	strcpy_s(cPacket.message, message);
+	cPacket.header.size = packet->header.size;
+	cPacket.header.type = SC_PACKET_LIST::SC_CHAT;
+
+	session->Send(reinterpret_cast<BYTE*>(&cPacket), cPacket.header.size);
+
 	return true;
 }
 

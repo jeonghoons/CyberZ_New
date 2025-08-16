@@ -4,9 +4,9 @@
 using namespace DirectX;
 
 // Packet Key
-enum class SC_PACKET_LIST : unsigned char
+enum SC_PACKET_LIST : unsigned char
 {
-	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_DELETE_PLAYER
+	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_DELETE_PLAYER, SC_CHAT
 };
 
 enum CS_PACKET_LIST : unsigned char
@@ -38,6 +38,11 @@ struct CS_CHAT_PACKET {
 // ------------------------------------------
 struct SC_LOGIN_INFO_PACKET {
 	
+};
+
+struct SC_CHAT_PACKET {
+	PacketHeader header;
+	char message[1024];
 };
 
 #pragma pack (pop)

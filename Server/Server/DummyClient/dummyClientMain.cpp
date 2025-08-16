@@ -1,6 +1,6 @@
 ﻿// #include "..//Server/pch.h"
 #include "Network.h"
-
+#include <string>
 
 void HandleError(const char* cause)
 {

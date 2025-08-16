@@ -31,6 +31,8 @@ public:
 	virtual void	OnConnected();
 	void			Disconnect(const WCHAR* cause);
 
+	void			Send(BYTE* buffer, int len);
+
 	int			ProcessData(BYTE* buffer, int len);
 	void			ProcessPacket(BYTE* buffer, int len);
 
@@ -51,7 +53,7 @@ private:
 	SOCKET _socket;
 	NetAddress		_netAddress = {};
 	atomic<bool>		_connected = false;
-	unsigned int		_cid{};
+	unsigned int		_cid = {};
 
 	RecvEvent		_recvEvent;
 	SendEvent		_sendEvent;

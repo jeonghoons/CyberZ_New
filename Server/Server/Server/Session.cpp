@@ -60,6 +60,12 @@ void Session::Disconnect(const WCHAR* cause)
 	wcout << "DisConnect :" << cause << endl;
 }
 
+void Session::Send(BYTE* buffer, int len)
+{
+	memcpy(_sendBuffer, buffer, len);
+	RegisterSend();
+}
+
 int Session::ProcessData(BYTE* buffer, int len)
 {
 	int processLen = 0;
@@ -174,6 +180,7 @@ void Session::ProcessSend(int numOfBytes)
 {
 	_sendEvent.owner = nullptr;
 	ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
+	cout << "Send " << numOfBytes << " Bytes" << endl;
 
 	if (numOfBytes == 0)
 	{
