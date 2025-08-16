@@ -3,6 +3,7 @@
 #include "IocpCore.h"
 #include "NetAddress.h"
 #include "IocpEvent.h"
+#include "SendBuffer.h"
 
 class ServerService;
 
@@ -31,7 +32,7 @@ public:
 	virtual void	OnConnected();
 	void			Disconnect(const WCHAR* cause);
 
-	void			Send(BYTE* buffer, int len);
+	void			Send(shared_ptr<SendBuffer> sendBuffer);
 
 	int			ProcessData(BYTE* buffer, int len);
 	void			ProcessPacket(BYTE* buffer, int len);
@@ -44,9 +45,12 @@ private:
 	void			ProcessSend(int numOfBytes);
 
 public:
+	mutex		_lock;
 	RecvBuffer	_recvBuffer;
-	char			_sendBuffer[1024];
-
+	
+	// char			_sendBuffer[1024];
+	queue<shared_ptr<SendBuffer>> _sendQueue;
+	atomic<bool>		_sendRegistered = false;
 
 private:
 	weak_ptr<ServerService> _service;

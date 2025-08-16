@@ -60,10 +60,18 @@ void Session::Disconnect(const WCHAR* cause)
 	wcout << "DisConnect :" << cause << endl;
 }
 
-void Session::Send(BYTE* buffer, int len)
+
+void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 {
-	memcpy(_sendBuffer, buffer, len);
-	RegisterSend();
+	_lock.lock();
+	_sendQueue.push(sendBuffer);
+
+	if (_sendRegistered == false) {
+		_sendRegistered = true;
+		RegisterSend();
+	}
+
+	_lock.unlock();
 }
 
 int Session::ProcessData(BYTE* buffer, int len)
@@ -161,17 +169,38 @@ void Session::RegisterSend()
 	_sendEvent.Init();
 	_sendEvent.owner = shared_from_this();
 
-	WSABUF wsaBuf;
-	wsaBuf.buf = _sendBuffer;
-	wsaBuf.len = sizeof(_sendBuffer);
+	// _lock.lock();
+	int writeSize = 0;
+	while (_sendQueue.empty() == false)
+	{
+		shared_ptr<SendBuffer> sendBuffer = _sendQueue.front();
+		writeSize += sendBuffer->WritePos();
+
+		_sendQueue.pop();
+		_sendEvent.sendBuffers.push_back(sendBuffer);
+	}
+	// _lock.unlock();
+
+	vector<WSABUF> wsaBufs;
+	wsaBufs.reserve(_sendEvent.sendBuffers.size());
+	for (shared_ptr<SendBuffer> sendBuffer : _sendEvent.sendBuffers)
+	{
+		WSABUF wsaBuf;
+		wsaBuf.buf = reinterpret_cast<char*>(sendBuffer->Buffer());
+		wsaBuf.len = static_cast<LONG>(sendBuffer->WritePos());
+		wsaBufs.push_back(wsaBuf);
+	}
+
 
 	DWORD numOfBytes = 0;
-	if (SOCKET_ERROR == ::WSASend(_socket, &wsaBuf, 1, &numOfBytes, 0, &_sendEvent, nullptr))
+	if (SOCKET_ERROR == ::WSASend(_socket, wsaBufs.data(), (DWORD)wsaBufs.size(), &numOfBytes, 0, &_sendEvent, nullptr))
 	{
 		int errorCode = ::WSAGetLastError();
 		if (errorCode != WSA_IO_PENDING)
 		{
 			_sendEvent.owner = nullptr; // Release REF
+			_sendEvent.sendBuffers.clear();
+			_sendRegistered.store(false);
 		}
 	}
 }
@@ -179,7 +208,8 @@ void Session::RegisterSend()
 void Session::ProcessSend(int numOfBytes)
 {
 	_sendEvent.owner = nullptr;
-	ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
+	_sendEvent.sendBuffers.clear();
+	// ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
 	cout << "Send " << numOfBytes << " Bytes" << endl;
 
 	if (numOfBytes == 0)
@@ -187,6 +217,13 @@ void Session::ProcessSend(int numOfBytes)
 		Disconnect(L"Send 0");
 		return;
 	}
+
+	_lock.lock();
+	if (_sendQueue.empty())
+		_sendRegistered.store(false);
+	else
+		RegisterSend();
+	_lock.unlock();
 }
 
 

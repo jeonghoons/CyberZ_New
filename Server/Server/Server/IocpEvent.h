@@ -21,6 +21,7 @@ public:
 };
 
 class Session;
+class SendBuffer;
 
 class AcceptEvent : public IocpEvent
 {
@@ -41,5 +42,7 @@ class SendEvent : public IocpEvent
 {
 public:
 	SendEvent() : IocpEvent(EventType::Send) {}
+
+	vector<shared_ptr<SendBuffer>> sendBuffers;
 };
 

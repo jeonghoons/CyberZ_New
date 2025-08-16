@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "PacketHandler.h"
-
+#include "SendBuffer.h"
 
 bool Handle_CS_LOGIN(shared_ptr<Session> session, CS_LOGIN_PACKET* packet)
 {
@@ -23,7 +23,10 @@ bool Handle_CS_CHAT(shared_ptr<Session> session, CS_CHAT_PACKET* packet)
 	cPacket.header.size = packet->header.size;
 	cPacket.header.type = SC_PACKET_LIST::SC_CHAT;
 
-	session->Send(reinterpret_cast<BYTE*>(&cPacket), cPacket.header.size);
+	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(4096);
+	sendBuffer->CopyData(&cPacket, cPacket.header.size);
+
+	session->Send(sendBuffer);
 
 	return true;
 }
