@@ -13,6 +13,6 @@ public:
 
 private:
 	weak_ptr<Session> _ownerSession;
-	XMFLOAT3 _position;
+	XMFLOAT3 _position = {};
 };
 

@@ -13,7 +13,7 @@ Session::~Session()
 	if (_socket != INVALID_SOCKET)
 		::closesocket(_socket);
 
-	cout << "~Session" << endl;
+	cout << "~Session[" << _cid << "]" << endl;
 
 	_socket = INVALID_SOCKET;
 }
@@ -63,7 +63,7 @@ void Session::Disconnect(const WCHAR* cause)
 
 void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 {
-	_lock.lock();
+	// _lock.lock();
 	_sendQueue.push(sendBuffer);
 
 	if (_sendRegistered == false) {
@@ -71,7 +71,7 @@ void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 		RegisterSend();
 	}
 
-	_lock.unlock();
+	// _lock.unlock();
 }
 
 int Session::ProcessData(BYTE* buffer, int len)
@@ -218,12 +218,10 @@ void Session::ProcessSend(int numOfBytes)
 		return;
 	}
 
-	_lock.lock();
 	if (_sendQueue.empty())
 		_sendRegistered.store(false);
 	else
 		RegisterSend();
-	_lock.unlock();
 }
 
 

@@ -11,15 +11,19 @@ void Room::EnterRoom(shared_ptr<Player> player)
 	_players[player->GetSession()->GetId()] = player;	
 	player->SetPosition(RandomPos());
 
-	// 신규 -> 기존
+	// 신규에게 기존유저들을 ADD
 	for (auto& p : _players) {
 		if (p.second == player)
 			continue;
-		p.second->GetSession()->Send(PacketHandler::MakePacket(SC_PACKET_LIST::SC_ADD_PLAYER));
+		player->GetSession()->Send(PacketHandler::MakePacket(p.second->GetSession(), SC_PACKET_LIST::SC_LOGIN));
 	}
-	
-	
-	// 기존 -> 신규
+
+	// 기존유저들에게 신규유저를 ADD
+	for (auto& p : _players) {
+		if (p.second == player)
+			continue;
+		p.second->GetSession()->Send(PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_LOGIN));
+	}
 	
 
 }

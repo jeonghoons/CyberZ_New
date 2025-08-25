@@ -60,14 +60,22 @@ bool PacketHandler::HandlePacket(shared_ptr<Session> session, BYTE* buffer, int 
 	return true;
 }
 
-shared_ptr<SendBuffer> PacketHandler::MakePacket(SC_PACKET_LIST type)
+shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC_PACKET_LIST type)
 {
-	return shared_ptr<SendBuffer>();
-
+	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(4096);
+	
 	switch (type)
 	{
 	case SC_LOGIN:
+	{
+		SC_LOGIN_INFO_PACKET packet;
+		packet.header = { sizeof(packet), SC_LOGIN };
+		packet.playerId = session->GetId();
+		sendBuffer->CopyData(&packet, packet.header.size);
+		
 		break;
+
+	}
 	case SC_LOGOUT:
 		break;
 	case SC_ADD_PLAYER:
@@ -79,4 +87,6 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(SC_PACKET_LIST type)
 	default:
 		break;
 	}
+
+	return sendBuffer;
 }

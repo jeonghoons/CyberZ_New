@@ -37,11 +37,12 @@ struct CS_CHAT_PACKET {
 
 // ------------------------------------------
 struct SC_LOGIN_INFO_PACKET {
-	
+	PacketHeader header;
+	int			playerId;
 };
 
 struct SC_ADD_PLAYER {
-
+	PacketHeader header;
 };
 
 struct SC_CHAT_PACKET {

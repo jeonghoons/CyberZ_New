@@ -13,7 +13,7 @@ class PacketHandler
 public:
 
 	static bool HandlePacket(shared_ptr<Session> session, BYTE* buffer, int len);
-	static shared_ptr<SendBuffer> MakePacket(SC_PACKET_LIST type);
+	static shared_ptr<SendBuffer> MakePacket(shared_ptr<Session> session, SC_PACKET_LIST type);
 };
 
 
