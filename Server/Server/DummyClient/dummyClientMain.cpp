@@ -10,6 +10,15 @@ void HandleError(const char* cause)
 
 static const int   TARGET_FPS = 60;           // 목표 FPS
 
+class Player
+{
+public:
+	Player() = default;
+	~Player() = default;
+};
+
+map<int, Player> players;
+
 int main()
 {
 	// this_thread::sleep_for(3s);
@@ -31,6 +40,10 @@ int main()
 	if (network.Connect2Server() == false)
 		exit(-1);
 
+	CS_LOGIN_PACKET loginPkt;
+	loginPkt.header.type = CS_PACKET_LIST::CS_LOGIN;
+	loginPkt.header.size = sizeof(loginPkt);
+	network.Send_packet(&loginPkt);
 	
 	cout << "Connected to Server" << endl;
 

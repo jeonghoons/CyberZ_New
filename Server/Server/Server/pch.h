@@ -19,6 +19,9 @@ using namespace std;
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <map>
+
+#include <random>
 
 extern thread_local unsigned int Lthreadid;
 

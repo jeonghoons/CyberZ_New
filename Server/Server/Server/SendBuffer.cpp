@@ -8,6 +8,7 @@ SendBuffer::SendBuffer(int bufferSize)
 
 SendBuffer::~SendBuffer()
 {
+	_buffer.clear();
 }
 
 void SendBuffer::CopyData(void* data, int len)

@@ -1,10 +1,18 @@
 #include "pch.h"
 #include "PacketHandler.h"
 #include "SendBuffer.h"
+#include "Room.h"
+#include "Player.h"
 
 bool Handle_CS_LOGIN(shared_ptr<Session> session, CS_LOGIN_PACKET* packet)
 {
 	// CS_LOGIN_PACKET* loginPkt = reinterpret_cast<CS_LOGIN_PACKET*>(buffer);
+
+	shared_ptr<Player> player = make_shared<Player>(session);
+
+	GRoom->EnterRoom(player);
+	
+
 	return true;
 }
 
@@ -26,12 +34,13 @@ bool Handle_CS_CHAT(shared_ptr<Session> session, CS_CHAT_PACKET* packet)
 	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(4096);
 	sendBuffer->CopyData(&cPacket, cPacket.header.size);
 
-	session->Send(sendBuffer);
+	
+	GRoom->Broadcast(sendBuffer);
 
 	return true;
 }
 
-bool PacketHandler::HandlerPacket(shared_ptr<Session> session, BYTE* buffer, int len)
+bool PacketHandler::HandlePacket(shared_ptr<Session> session, BYTE* buffer, int len)
 {
 	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 	
@@ -49,4 +58,25 @@ bool PacketHandler::HandlerPacket(shared_ptr<Session> session, BYTE* buffer, int
 
 
 	return true;
+}
+
+shared_ptr<SendBuffer> PacketHandler::MakePacket(SC_PACKET_LIST type)
+{
+	return shared_ptr<SendBuffer>();
+
+	switch (type)
+	{
+	case SC_LOGIN:
+		break;
+	case SC_LOGOUT:
+		break;
+	case SC_ADD_PLAYER:
+		break;
+	case SC_DELETE_PLAYER:
+		break;
+	case SC_CHAT:
+		break;
+	default:
+		break;
+	}
 }

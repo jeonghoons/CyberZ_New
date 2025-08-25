@@ -40,6 +40,10 @@ struct SC_LOGIN_INFO_PACKET {
 	
 };
 
+struct SC_ADD_PLAYER {
+
+};
+
 struct SC_CHAT_PACKET {
 	PacketHeader header;
 	char message[1024];

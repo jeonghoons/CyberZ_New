@@ -102,7 +102,7 @@ void Session::ProcessPacket(BYTE* buffer, int len)
 	shared_ptr<Session> session = static_pointer_cast<Session>(shared_from_this());
 	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
 
-	PacketHandler::HandlerPacket(session, buffer, len);
+	PacketHandler::HandlePacket(session, buffer, len);
 
 }
 

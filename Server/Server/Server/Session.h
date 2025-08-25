@@ -48,7 +48,7 @@ public:
 	mutex		_lock;
 	RecvBuffer	_recvBuffer;
 	
-	// char			_sendBuffer[1024];
+
 	queue<shared_ptr<SendBuffer>> _sendQueue;
 	atomic<bool>		_sendRegistered = false;
 

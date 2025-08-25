@@ -13,6 +13,9 @@
     <Filter Include="Protocol">
       <UniqueIdentifier>{e5844e9b-d64a-48d1-86ff-2d303e6653ef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Contents">
+      <UniqueIdentifier>{3e81e933-df1e-4e82-bad6-758204284830}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -48,6 +51,12 @@
     <ClCompile Include="SendBuffer.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -82,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="SendBuffer.h">
       <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Contents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
