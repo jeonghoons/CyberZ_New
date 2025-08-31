@@ -11,6 +11,8 @@ public:
 	void LeaveRoom(shared_ptr<Player> player);
 	void Broadcast(shared_ptr<SendBuffer> sendBuffer);
 
+	shared_ptr<Player> Id2Player(int pId) { return _players[pId]; }
+
 	XMFLOAT3 RandomPos();
 
 private:

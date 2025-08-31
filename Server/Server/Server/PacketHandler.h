@@ -16,4 +16,7 @@ public:
 	static shared_ptr<SendBuffer> MakePacket(shared_ptr<Session> session, SC_PACKET_LIST type);
 };
 
+bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
+bool MAKE_SC_DELETE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
+
 

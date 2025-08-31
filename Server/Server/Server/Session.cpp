@@ -2,6 +2,8 @@
 #include "Session.h"
 #include "ServerService.h"
 #include "PacketHandler.h"
+#include "Room.h"
+#include "Player.h"
 
 Session::Session() : _recvBuffer(65536)
 {
@@ -57,13 +59,15 @@ void Session::Disconnect(const WCHAR* cause)
 
 	GetService()->ReleaseSession(static_pointer_cast<Session>(shared_from_this()));
 
+	GRoom->LeaveRoom(GRoom->Id2Player(_cid));
+	
 	wcout << "DisConnect :" << cause << endl;
 }
 
 
 void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 {
-	// _lock.lock();
+	_lock.lock();
 	_sendQueue.push(sendBuffer);
 
 	if (_sendRegistered == false) {
@@ -71,7 +75,7 @@ void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 		RegisterSend();
 	}
 
-	// _lock.unlock();
+	_lock.unlock();
 }
 
 int Session::ProcessData(BYTE* buffer, int len)
@@ -137,7 +141,7 @@ void Session::ProcessRecv(int numOfBytes)
 {
 	_recvEvent.owner = nullptr;
 
-	cout << "Recv " << numOfBytes << " Bytes" << endl;
+	// cout << "Recv " << numOfBytes << " Bytes" << endl;
 	if (numOfBytes == 0) {
 		Disconnect(L"Recv 0");
 		return;
@@ -163,8 +167,9 @@ void Session::ProcessRecv(int numOfBytes)
 
 void Session::RegisterSend()
 {
-	if (IsConnected() == false)
+	if (IsConnected() == false) {
 		return;
+	}
 
 	_sendEvent.Init();
 	_sendEvent.owner = shared_from_this();
@@ -218,10 +223,12 @@ void Session::ProcessSend(int numOfBytes)
 		return;
 	}
 
+	_lock.lock();
 	if (_sendQueue.empty())
 		_sendRegistered.store(false);
 	else
 		RegisterSend();
+	_lock.unlock();
 }
 
 

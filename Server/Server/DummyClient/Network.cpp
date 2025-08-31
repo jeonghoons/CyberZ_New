@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Network.h"
 
 Network::Network() : _recvBuffer(65536)
@@ -11,13 +12,13 @@ Network::Network() : _recvBuffer(65536)
 
 Network::~Network()
 {
-	::closesocket(_socket);
+	// ::closesocket(_socket);
 	WSACleanup();
 }
 
 bool Network::Connect2Server()
 {
-	_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	/*_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_socket == INVALID_SOCKET)
 		return false;
 
@@ -43,5 +44,14 @@ bool Network::Connect2Server()
 		}
 	}
 
-	return true;
+	return true;*/
+
+	wcout.imbue(locale("korean"));
+	sf::Socket::Status status = _socket.connect("127.0.0.1", PORT_NUM);
+	_socket.setBlocking(false);
+
+	if (status != sf::Socket::Done) {
+		wcout << L"서버와 연결할 수 없습니다.\n";
+		exit(-1);
+	}
 }

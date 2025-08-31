@@ -11,16 +11,32 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{7170b161-41be-47f6-89ab-0e4eb9759691}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{3e43d383-d6f0-4e93-a15e-f9e5c3970b23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dummyClientMain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="Network.cpp" />
-    <ClCompile Include="..\Server\RecvBuffer.cpp" />
+    <ClCompile Include="Network.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="RecvBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Network.h" />
-    <ClInclude Include="..\Server\RecvBuffer.h" />
+    <ClInclude Include="Network.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RecvBuffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

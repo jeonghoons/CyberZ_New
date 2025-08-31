@@ -40,6 +40,8 @@ bool Handle_CS_CHAT(shared_ptr<Session> session, CS_CHAT_PACKET* packet)
 	return true;
 }
 
+
+
 bool PacketHandler::HandlePacket(shared_ptr<Session> session, BYTE* buffer, int len)
 {
 	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
@@ -66,19 +68,11 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 	
 	switch (type)
 	{
-	case SC_LOGIN:
-	{
-		SC_LOGIN_INFO_PACKET packet;
-		packet.header = { sizeof(packet), SC_LOGIN };
-		packet.playerId = session->GetId();
-		sendBuffer->CopyData(&packet, packet.header.size);
-		
+	case SC_ADD_PLAYER:
+		MAKE_SC_ADD_PLAYER(session, sendBuffer);
 		break;
 
-	}
 	case SC_LOGOUT:
-		break;
-	case SC_ADD_PLAYER:
 		break;
 	case SC_DELETE_PLAYER:
 		break;
@@ -89,4 +83,23 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 	}
 
 	return sendBuffer;
+}
+
+bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
+{
+	SC_LOGIN_INFO_PACKET packet;
+	packet.header = { sizeof(packet), SC_ADD_PLAYER };
+	packet.playerId = session->GetId();
+	buffer->CopyData(&packet, packet.header.size);
+
+	return true;
+}
+
+bool MAKE_SC_DELETE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
+{
+	SC_LOGIN_INFO_PACKET packet;
+	packet.header = { sizeof(packet), SC_DELETE_PLAYER };
+	packet.playerId = session->GetId();
+	buffer->CopyData(&packet, packet.header.size);
+	return true;
 }

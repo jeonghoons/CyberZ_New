@@ -1,12 +1,13 @@
-﻿// #include "..//Server/pch.h"
+﻿
+#include "pch.h"
 #include "Network.h"
 #include <string>
 
-void HandleError(const char* cause)
-{
-	int errCode = ::WSAGetLastError();
-	cout << cause << " ErrorCode : " << errCode << endl;
-}
+//void HandleError(const char* cause)
+//{
+//	int errCode = ::WSAGetLastError();
+//	cout << cause << " ErrorCode : " << errCode << endl;
+//}
 
 static const int   TARGET_FPS = 60;           // 목표 FPS
 
@@ -21,20 +22,6 @@ map<int, Player> players;
 
 int main()
 {
-	// this_thread::sleep_for(3s);
-	
-
-	/*while (true)
-	{
-		if (::connect(clientSocket, (SOCKADDR*)(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
-		{
-			if (::WSAGetLastError() == WSAEWOULDBLOCK)
-				continue;
-			if (::WSAGetLastError() == WSAEISCONN)
-				break;
-			break;
-		}
-	}*/
 
 	Network network;
 	if (network.Connect2Server() == false)
@@ -54,9 +41,6 @@ int main()
 			std::getline(std::cin, input);
 			if (input.empty()) continue;
 
-			// int sent = send(clientSocket, chatMessage.c_str(), static_cast<int>(chatMessage.size()), 0);
-			
-			
 			CS_CHAT_PACKET packet;
 			strncpy_s(packet.message, input.c_str(), sizeof(packet.message) - 1);
 			packet.message[sizeof(packet.message) - 1] = '\0';  // 널 종료 보장
@@ -64,11 +48,6 @@ int main()
 			packet.header.type = CS_CHAT;
 			network.Send_packet(&packet);
 
-			/*if (sent == SOCKET_ERROR)
-			{
-				std::cerr << "[전송 오류] 서버에 메시지를 보낼 수 없습니다.\n";
-				break;
-			}*/
 		}
 		});
 

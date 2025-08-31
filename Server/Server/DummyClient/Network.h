@@ -1,5 +1,6 @@
 #pragma once
-#include "../Server/RecvBuffer.h"
+#include "pch.h"
+#include "RecvBuffer.h"
 
 class Network
 {
@@ -13,50 +14,38 @@ public:
 	{
 		unsigned char* p = reinterpret_cast<unsigned char*>(buffer);
 		size_t sent = 0;
-		int len = send(_socket, reinterpret_cast<char*>(p), static_cast<int>(p[0]), sent);
-		cout << len << "Bytes Send" << endl;
+		// int len = send(_socket, reinterpret_cast<char*>(p), static_cast<int>(p[0]), sent);
+		_socket.send(buffer, p[0], sent);
+		cout << sent << "Bytes Send" << endl;
 	}
 
 	int RecvPacket()
 	{
 
-		size_t sent = 0;
+		size_t received = 0;
 
-		int len = recv(_socket, reinterpret_cast<char*>(_recvBuffer.WritePos()), _recvBuffer.FreeSize(), sent);
-
+		// int len = recv(_socket, reinterpret_cast<char*>(_recvBuffer.WritePos()), _recvBuffer.FreeSize(), sent);
+		auto recv_result = _socket.receive(_recvBuffer.WritePos(), _recvBuffer.FreeSize(), received);
+		if (recv_result == sf::Socket::Error)
+		{
+			wcout << L"Recv ¿¡·¯!";
+			exit(-1);
+		}
+		if (recv_result == sf::Socket::Disconnected) {
+			wcout << L"Disconnected\n";
+			exit(-1);
+		}
 		
-		if (len > 0) {
-			process_data(_recvBuffer.ReadPos(), len);
+		if (received > 0) {
+			process_data(_recvBuffer.ReadPos(), received);
 			// cout << len << "Bytes Recv" << endl;
 		}
 		
-		return len;
+		return received;
 	}
 
 	int process_data(BYTE* net_buf, int io_byte)
 	{
-		/*char* ptr = net_buf;
-		static size_t in_packet_size = 0;
-		static size_t saved_packet_size = 0;
-		static char packet_buffer[BUF_SIZE];
-
-		while (0 != io_byte) {
-			if (0 == in_packet_size) in_packet_size = ptr[0];
-			if (io_byte + saved_packet_size >= in_packet_size) {
-				memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
-				ProcessPacket(packet_buffer);
-				ptr += in_packet_size - saved_packet_size;
-				io_byte -= in_packet_size - saved_packet_size;
-				in_packet_size = 0;
-				saved_packet_size = 0;
-			}
-			else {
-				memcpy(packet_buffer + saved_packet_size, ptr, io_byte);
-				saved_packet_size += io_byte;
-				io_byte = 0;
-			}
-		}*/
-
 		int processLen = 0;
 
 		while (true)
@@ -85,8 +74,12 @@ public:
 
 		switch (header->type)
 		{
-		case SC_PACKET_LIST::SC_LOGIN:
+		case SC_PACKET_LIST::SC_ADD_PLAYER:
 			cout << "ADD PLAYER " << io_byte << "Bytes " << endl;
+			break;
+
+		case SC_PACKET_LIST::SC_DELETE_PLAYER:
+			cout << "DELETE PLAYER " << io_byte << "Bytes " << endl;
 			break;
 
 		case SC_PACKET_LIST::SC_CHAT:
@@ -99,7 +92,7 @@ public:
 	}
 
 private:
-	SOCKET		_socket;
+	sf::TcpSocket		_socket;
 	RecvBuffer	_recvBuffer;
 	char			_sendBuffer[1024] = { 0, };
 
