@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "Network.h"
 #include <string>
+#include "Object.h"
 
 //void HandleError(const char* cause)
 //{
@@ -11,19 +12,107 @@
 
 static const int   TARGET_FPS = 60;           // 목표 FPS
 
-class Player
-{
-public:
-	Player() = default;
-	~Player() = default;
-};
 
-map<int, Player> players;
+
+Object myPlayer;
+unordered_map <int, Object> players;
+
+Object white_tile;
+Object black_tile;
+
+sf::Texture* board;
+sf::Texture* pieces;
+
+Network network;
+
+vector<vector<Object>> tileMap(32);
+
+void client_initialize()
+{
+	board = new sf::Texture;
+	pieces = new sf::Texture;
+	board->loadFromFile("gamemap.bmp");
+
+	pieces->loadFromFile("charactersheet.bmp");
+	// pieces->loadFromFile("chess2.png");
+	
+	for (int i = 0; i < 32; i++) {
+		for (int j = 0; j < 32; j++) {
+			int tile_x = i * (512 / 32);
+			int tile_y = j * (512 / 32);
+			Object tile(*board, tile_x, tile_y, 16, 16);
+			tile.SetPosition(i, j);
+			tile.SetScale(float(TILE_WIDTH) / 16.f);
+			tileMap[i].emplace_back(tile);
+		}
+	}
+
+	g_font = new sf::Font();
+	if (false == g_font->loadFromFile("cour.ttf")) {
+		cout << "Font Loading Error!\n";
+		exit(-1);
+	}
+	// white_tile = Object{ *board, 0, 0, TILE_WIDTH, TILE_WIDTH };
+	// white_tile = Object{ *board, 69, 5, TILE_WIDTH, TILE_WIDTH };
+	// black_tile = Object{ *board, 0, 0, TILE_WIDTH, TILE_WIDTH };
+	// black_tile = Object{ *board, 5, 5, TILE_WIDTH, TILE_WIDTH };
+	myPlayer = Object{ *pieces, 0, 0, TILE_WIDTH-1, TILE_WIDTH-1 };
+	myPlayer.SetPosition(1, 1);
+	/*g_left_x = 27 - 16 / 2;
+	g_top_y = 27 - 16 / 2;*/
+}
+
+void client_finish()
+{
+	players.clear();
+	delete g_font;
+	delete board;
+	delete pieces;
+}
+
+void client_main()
+{
+	network.RecvPacket();
+
+	for (auto tiles : tileMap)
+		for (auto tile : tiles)
+			tile.draw();
+
+	/*for (int i = 0; i < SCREEN_WIDTH; i++) {
+		for (int j = 0; j < SCREEN_HEIGHT; j++) {
+			int tile_x = i * TILE_WIDTH;
+			int tile_y = j * TILE_WIDTH;
+			Object tile(*board, tile_x, tile_y, TILE_WIDTH, TILE_WIDTH);
+			tile.a_move(i * TILE_WIDTH, j * TILE_WIDTH);
+			tile.a_draw();
+
+		}
+	}*/
+
+	/*for (int i = 0; i < 32; i++) {
+		for (int j = 0; j < 32; j++) {
+			
+			tile.draw();
+		}
+	}*/
+	
+
+	myPlayer.draw();
+	for (auto& pl : players) pl.second.draw();
+	sf::Text text;
+	text.setFont(*g_font);
+	char buf[100];
+	sprintf_s(buf, "(%d, %d)", myPlayer.GetPosition().first, myPlayer.GetPosition().second);
+	// sprintf_s(buf, "(%d, %d) - LV : %d   HP[%d/%d] ", avatar.GetPosition().first, avatar.GetPosition().second, avatar.level, avatar.hp, avatar.max_hp);
+	text.setString(buf);
+	g_window->draw(text);
+}
+
 
 int main()
 {
-
-	Network network;
+	client_initialize();
+	
 	if (network.Connect2Server() == false)
 		exit(-1);
 
@@ -34,56 +123,65 @@ int main()
 	
 	cout << "Connected to Server" << endl;
 
-	std::thread inputThread([&network]() {
-		while (true)
-		{
-			std::string input;
-			std::getline(std::cin, input);
-			if (input.empty()) continue;
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "2D CLIENT");
+	g_window = &window;
 
-			CS_CHAT_PACKET packet;
-			strncpy_s(packet.message, input.c_str(), sizeof(packet.message) - 1);
-			packet.message[sizeof(packet.message) - 1] = '\0';  // 널 종료 보장
-			packet.header.size = static_cast<uint16_t>(std::strlen(packet.message) + sizeof(PacketHeader));
-			packet.header.type = CS_CHAT;
-			network.Send_packet(&packet);
-
-		}
-		});
-
-	// 4) 메인 루프 (60 FPS) ------------------------------------------------
-	using clock = std::chrono::high_resolution_clock;
-	using duration = clock::duration;
-	auto nextFrame = clock::now();
-	static const duration FRAME_TIME = std::chrono::duration_cast<duration>(std::chrono::duration<double>(1.0 / TARGET_FPS));
-
-
-	while (true)
+	while (window.isOpen())
 	{
-		const auto frameStart = clock::now();
-
-
-		// 프레임 유지
-		while (clock::now() - frameStart < FRAME_TIME) {
-			// 실제 게임 클라이언트와 유사하게 sleep 없이 루프를 유지합니다.
-		}
-
-		nextFrame = frameStart;
-
-		// FPS 출력 (1초마다)
-		static int fpsCounter = 0;
-		++fpsCounter;
-		static auto lastFpsReport = frameStart;
-		if (frameStart - lastFpsReport >= std::chrono::seconds(1))
+		sf::Event event;
+		while (window.pollEvent(event))
 		{
-			network.RecvPacket();
-			// std::cout << "FPS: " << fpsCounter << "\n";
-			fpsCounter = 0;
-			lastFpsReport = frameStart;
-		}
-	}
+			if (event.type == sf::Event::Closed)
+				window.close();
+			if (event.type == sf::Event::KeyPressed) {
+				int direction = -1;
+				switch (event.key.code) {
+				
+				case sf::Keyboard::Left:
+					direction = 2;
+					break;
+				case sf::Keyboard::Right:
+					direction = 3;
+					break;
+				case sf::Keyboard::Up:
+					direction = 0;
+					break;
+				case sf::Keyboard::Down:
+					direction = 1;
+					break;
+				
+				case sf::Keyboard::C: {
+					cout << "메세지 입력 : ";
+					/*char chat[CHAT_SIZE];
+					cin.getline(chat, CHAT_SIZE - 1);
+					CS_CHAT_PACKET p;
+					p.size = static_cast<int>(strlen(chat)) + 3;
+					memcpy(p.mess, chat, p.size);
+					p.type = CS_CHAT;
+					cout << p.size << "바이트,	" << p.mess << endl;
+					send_packet(&p);*/
+					break;
 
-	inputThread.detach();  // 입력 스레드 분리 종료
-	
-	return 0;
+				}
+				case sf::Keyboard::Escape:
+					window.close();
+					break;
+				}
+				/*if (-1 != direction) {
+					CS_MOVE_PACKET p;
+					p.size = sizeof(p);
+					p.type = CS_MOVE;
+					p.direction = direction;
+					send_packet(&p);
+				}*/
+
+			}
+		}
+
+		window.clear();
+		client_main();
+		window.display();
+	}
+	client_finish();
+
 }

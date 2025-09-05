@@ -14,6 +14,9 @@
     <Filter Include="Network">
       <UniqueIdentifier>{3e43d383-d6f0-4e93-a15e-f9e5c3970b23}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameContents">
+      <UniqueIdentifier>{c14f917c-3193-4443-8a0f-82d21e80a0e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dummyClientMain.cpp">
@@ -25,7 +28,12 @@
     <ClCompile Include="pch.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="RecvBuffer.cpp" />
+    <ClCompile Include="RecvBuffer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>GameContents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.h">
@@ -34,7 +42,12 @@
     <ClInclude Include="pch.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="RecvBuffer.h" />
+    <ClInclude Include="RecvBuffer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>GameContents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

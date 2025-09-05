@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "RecvBuffer.h"
 
+
 class Network
 {
 public:
@@ -36,10 +37,13 @@ public:
 			exit(-1);
 		}
 		
-		if (received > 0) {
-			process_data(_recvBuffer.ReadPos(), received);
-			// cout << len << "Bytes Recv" << endl;
-		}
+		if (recv_result != sf::Socket::NotReady)
+			if (received > 0) process_data(_recvBuffer.ReadPos(), received);
+
+		//if (received > 0) {
+		//	process_data(_recvBuffer.ReadPos(), received);
+		//	// cout << len << "Bytes Recv" << endl;
+		//}
 		
 		return received;
 	}
@@ -76,6 +80,7 @@ public:
 		{
 		case SC_PACKET_LIST::SC_ADD_PLAYER:
 			cout << "ADD PLAYER " << io_byte << "Bytes " << endl;
+			
 			break;
 
 		case SC_PACKET_LIST::SC_DELETE_PLAYER:

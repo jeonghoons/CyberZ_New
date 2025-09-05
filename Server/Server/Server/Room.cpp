@@ -31,6 +31,9 @@ void Room::EnterRoom(shared_ptr<Player> player)
 void Room::LeaveRoom(shared_ptr<Player> player)
 {
 	_players.erase(player->GetSession()->GetId());
+
+	shared_ptr<SendBuffer> sendBuffer = PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_DELETE_PLAYER);
+	Broadcast(sendBuffer);
 }
 
 void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)

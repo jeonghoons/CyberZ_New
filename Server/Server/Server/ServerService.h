@@ -3,6 +3,7 @@
 #include "IocpCore.h"
 #include "Session.h"
 #include "NetAddress.h"
+#include "Room.h"
 
 class ServerService : public enable_shared_from_this<ServerService>
 {
@@ -20,12 +21,14 @@ public:
 	void			ReleaseSession(shared_ptr<Session> session);
 
 private:
+	mutex					_lock;
+
 	shared_ptr<Listener>		_listener;
 	NetAddress				_netAddress;
 	shared_ptr<IocpCore>		_iocpCore;
-
-	mutex					_lock;
+	
 	vector<shared_ptr<Session>> _sessions;
 
+	vector<shared_ptr<Room>>	_Rooms;
 };
 
