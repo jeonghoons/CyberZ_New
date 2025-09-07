@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "RecvBuffer.h"
-
+#include "Object.h"
 
 class Network
 {
@@ -78,14 +78,47 @@ public:
 
 		switch (header->type)
 		{
+		case SC_LOGIN:
+		{
+			cout << "LogIN " << io_byte << "Bytes " << endl;
+			SC_LOGIN_INFO_PACKET* packet = reinterpret_cast<SC_LOGIN_INFO_PACKET*>(net_buf);
+			g_myid = packet->player.id;
+			myPlayer.SetId(g_myid);
+			int posX = packet->player.position.first;
+			int posY = packet->player.position.second;
+			myPlayer.SetPosition(posX, posY);
+			g_left_x = posX - SCREEN_WIDTH / 2;
+			g_top_y = posY - SCREEN_HEIGHT / 2;
+		}
+			break;
 		case SC_PACKET_LIST::SC_ADD_PLAYER:
+		{
 			cout << "ADD PLAYER " << io_byte << "Bytes " << endl;
-			
+
+			SC_ADD_PLAYER_PACKET* packet = reinterpret_cast<SC_ADD_PLAYER_PACKET*>(net_buf);
+			int id = packet->player.id;
+			int posX = packet->player.position.first;
+			int posY = packet->player.position.second;
+
+			if (id == g_myid) {
+				int posX = packet->player.position.first;
+				int posY = packet->player.position.second;
+				myPlayer.SetPosition(posX, posY);
+				g_left_x = posX - SCREEN_WIDTH / 2;
+				g_top_y = posY - SCREEN_HEIGHT / 2;
+			}
+			else {
+				players[id] = Object{ *pieces, 44, 0,TILE_WIDTH - 1, TILE_WIDTH - 1 };
+				players[id].SetPosition(posX, posY);
+			}
+		}
 			break;
 
-		case SC_PACKET_LIST::SC_DELETE_PLAYER:
+		case SC_PACKET_LIST::SC_REMOVE_PLAYER:
 			cout << "DELETE PLAYER " << io_byte << "Bytes " << endl;
 			break;
+
+		case SC_PACKET_LIST::SC_MOVE_OBJECT:
 
 		case SC_PACKET_LIST::SC_CHAT:
 			cout << "Chatting " << io_byte << "Bytes " << endl;

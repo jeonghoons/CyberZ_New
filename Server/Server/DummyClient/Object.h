@@ -1,4 +1,6 @@
 #pragma once
+#include "pch.h"
+
 class Object
 {
 public:
@@ -57,6 +59,8 @@ public:
 		m_name.setFillColor(sf::Color(255, 255, 0));
 		m_name.setStyle(sf::Text::Bold);
 	}
+	int GetId() const { return _id; }
+	void SetId(int id) { _id = id; }
 
 private:
 	sf::Sprite m_sprite;
@@ -69,4 +73,7 @@ private:
 	int m_x, m_y;
 	char name[20];
 };
+
+extern Object myPlayer;
+extern std::unordered_map<int, Object> players;
 

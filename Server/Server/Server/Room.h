@@ -13,7 +13,7 @@ public:
 
 	shared_ptr<Player> Id2Player(int pId) { return _players[pId]; }
 
-	XMFLOAT3 RandomPos();
+	pair<int, int> RandomPos();
 
 private:
 

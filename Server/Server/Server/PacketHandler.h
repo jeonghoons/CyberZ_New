@@ -17,6 +17,6 @@ public:
 };
 
 bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
-bool MAKE_SC_DELETE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
+bool MAKE_SC_REMOVE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
 
 

@@ -16,6 +16,7 @@
 
 #include "..//Server/TestProtocol.h"
 
+
 using namespace std;
 
 #define PORT_NUM 8888
@@ -35,3 +36,8 @@ static int g_top_y;
 static int g_myid;
 extern sf::RenderWindow* g_window;
 extern sf::Font* g_font;
+
+extern sf::Texture* board;
+extern sf::Texture* pieces;
+
+

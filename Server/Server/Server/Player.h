@@ -8,13 +8,16 @@ public:
 	Player(shared_ptr<Session> ownerSession);
 	~Player() = default;
 
-	shared_ptr<Session> GetSession() { return _ownerSession.lock(); }
-	void SetPosition(XMFLOAT3 position) { _position = position; }
+	shared_ptr<Session> GetSession() const { return _ownerSession.lock(); }
+	void SetPosition(pair<int, int> position) { _position = position; }
+	pair<int, int> GetPosition() const { return _position; }
 
 private:
 	weak_ptr<Session> _ownerSession;
-	XMFLOAT3 _position = {};
+	pair<int, int> _position = {};
 
 	// map<int>		_viewList;
 };
+
+
 

@@ -8,8 +8,19 @@ shared_ptr<Room> GRoom = make_shared<Room>();
 
 void Room::EnterRoom(shared_ptr<Player> player)
 {
-	_players[player->GetSession()->GetId()] = player;	
+	int p_id = player->GetSession()->GetId();
+	_players[p_id] = player;	
 	player->SetPosition(RandomPos());
+
+	SC_LOGIN_INFO_PACKET logInPacket;
+	logInPacket.header = { sizeof(SC_LOGIN_INFO_PACKET), SC_LOGIN };
+	logInPacket.player.id = p_id;
+	logInPacket.player.position = player->GetPosition();
+
+	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(sizeof(logInPacket));
+	sendBuffer->CopyData(&logInPacket, sizeof(logInPacket));
+	player->GetSession()->Send(sendBuffer);
+
 
 	// 신규에게 기존유저들을 ADD
 	for (auto& p : _players) {
@@ -30,10 +41,11 @@ void Room::EnterRoom(shared_ptr<Player> player)
 
 void Room::LeaveRoom(shared_ptr<Player> player)
 {
-	_players.erase(player->GetSession()->GetId());
 
-	shared_ptr<SendBuffer> sendBuffer = PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_DELETE_PLAYER);
+	shared_ptr<SendBuffer> sendBuffer = PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_REMOVE_PLAYER);
 	Broadcast(sendBuffer);
+
+	_players.erase(player->GetSession()->GetId());
 }
 
 void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
@@ -44,15 +56,14 @@ void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
 	}
 }
 
-XMFLOAT3 Room::RandomPos()
+pair<int, int> Room::RandomPos()
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	static std::uniform_real_distribution<float> dist(0.0f, 1000.0f);
+	static std::uniform_int_distribution<int> dist(0, 10);
 
-	float x = dist(gen);
-	float y = dist(gen);
-	float z = dist(gen);
+	int x = dist(gen);
+	int y = dist(gen);
 
-	return XMFLOAT3(x, y, z);
+	return { x, y };
 }

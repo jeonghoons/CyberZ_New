@@ -14,14 +14,8 @@ static const int   TARGET_FPS = 60;           // 목표 FPS
 
 
 
-Object myPlayer;
-unordered_map <int, Object> players;
 
-Object white_tile;
-Object black_tile;
 
-sf::Texture* board;
-sf::Texture* pieces;
 
 Network network;
 
@@ -52,14 +46,11 @@ void client_initialize()
 		cout << "Font Loading Error!\n";
 		exit(-1);
 	}
-	// white_tile = Object{ *board, 0, 0, TILE_WIDTH, TILE_WIDTH };
-	// white_tile = Object{ *board, 69, 5, TILE_WIDTH, TILE_WIDTH };
-	// black_tile = Object{ *board, 0, 0, TILE_WIDTH, TILE_WIDTH };
-	// black_tile = Object{ *board, 5, 5, TILE_WIDTH, TILE_WIDTH };
+	
+	
 	myPlayer = Object{ *pieces, 0, 0, TILE_WIDTH-1, TILE_WIDTH-1 };
-	myPlayer.SetPosition(1, 1);
-	/*g_left_x = 27 - 16 / 2;
-	g_top_y = 27 - 16 / 2;*/
+	myPlayer.SetPosition(0, 0);
+		
 }
 
 void client_finish()
@@ -77,24 +68,6 @@ void client_main()
 	for (auto tiles : tileMap)
 		for (auto tile : tiles)
 			tile.draw();
-
-	/*for (int i = 0; i < SCREEN_WIDTH; i++) {
-		for (int j = 0; j < SCREEN_HEIGHT; j++) {
-			int tile_x = i * TILE_WIDTH;
-			int tile_y = j * TILE_WIDTH;
-			Object tile(*board, tile_x, tile_y, TILE_WIDTH, TILE_WIDTH);
-			tile.a_move(i * TILE_WIDTH, j * TILE_WIDTH);
-			tile.a_draw();
-
-		}
-	}*/
-
-	/*for (int i = 0; i < 32; i++) {
-		for (int j = 0; j < 32; j++) {
-			
-			tile.draw();
-		}
-	}*/
 	
 
 	myPlayer.draw();

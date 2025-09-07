@@ -27,4 +27,6 @@ bool Network::Connect2Server()
 		wcout << L"서버와 연결할 수 없습니다.\n";
 		exit(-1);
 	}
+
+	return true;
 }

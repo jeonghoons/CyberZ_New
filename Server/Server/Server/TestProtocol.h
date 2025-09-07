@@ -6,7 +6,7 @@ using namespace DirectX;
 // Packet Key
 enum SC_PACKET_LIST : unsigned char
 {
-	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_DELETE_PLAYER, SC_CHAT
+	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_REMOVE_PLAYER, SC_CHAT, SC_MOVE_OBJECT, 
 };
 
 enum CS_PACKET_LIST : unsigned char
@@ -22,6 +22,18 @@ struct PacketHeader
 	unsigned short type;
 };
 
+struct PlayerInfo
+{
+	enum PLAYER_TYPE : unsigned char 
+	{
+
+	};
+
+	int id;
+	std::pair<int, int> position;
+	
+};
+
 struct CS_LOGIN_PACKET {
 	PacketHeader header;
 };
@@ -35,19 +47,37 @@ struct CS_CHAT_PACKET {
 	char message[1024];
 };
 
+struct CS_MOVE_PACKET {
+	PacketHeader header;
+	int			direction;
+};
+
 // ------------------------------------------
 struct SC_LOGIN_INFO_PACKET {
 	PacketHeader header;
-	int			playerId;
+	PlayerInfo			player;
 };
 
-struct SC_ADD_PLAYER {
+struct SC_ADD_PLAYER_PACKET {
 	PacketHeader header;
+	PlayerInfo			player;
+};
+
+struct SC_REMOVE_PLAYER_PACKET {
+	PacketHeader header;
+	int			playerId;
 };
 
 struct SC_CHAT_PACKET {
 	PacketHeader header;
 	char message[1024];
 };
+
+struct SC_MOVE_PACKET {
+	PacketHeader header;
+	std::pair<int, int> position;
+};
+
+
 
 #pragma pack (pop)

@@ -74,7 +74,8 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 
 	case SC_LOGOUT:
 		break;
-	case SC_DELETE_PLAYER:
+	case SC_REMOVE_PLAYER:
+		MAKE_SC_REMOVE_PLAYER(session, sendBuffer);
 		break;
 	case SC_CHAT:
 		break;
@@ -87,18 +88,19 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 
 bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
 {
-	SC_LOGIN_INFO_PACKET packet;
+	SC_ADD_PLAYER_PACKET packet;
 	packet.header = { sizeof(packet), SC_ADD_PLAYER };
-	packet.playerId = session->GetId();
+	packet.player.id = session->GetId();
+	packet.player.position = GRoom->Id2Player(session->GetId())->GetPosition();
 	buffer->CopyData(&packet, packet.header.size);
 
 	return true;
 }
 
-bool MAKE_SC_DELETE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
+bool MAKE_SC_REMOVE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
 {
-	SC_LOGIN_INFO_PACKET packet;
-	packet.header = { sizeof(packet), SC_DELETE_PLAYER };
+	SC_REMOVE_PLAYER_PACKET packet;
+	packet.header = { sizeof(packet), SC_REMOVE_PLAYER };
 	packet.playerId = session->GetId();
 	buffer->CopyData(&packet, packet.header.size);
 	return true;
