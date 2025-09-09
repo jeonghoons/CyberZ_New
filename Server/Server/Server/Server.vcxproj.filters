@@ -45,9 +45,6 @@
     <ClCompile Include="NetAddress.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
-    <ClCompile Include="PacketHandler.cpp">
-      <Filter>Protocol</Filter>
-    </ClCompile>
     <ClCompile Include="SendBuffer.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
@@ -56,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandler.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,9 +86,6 @@
     <ClInclude Include="TestProtocol.h">
       <Filter>Protocol</Filter>
     </ClInclude>
-    <ClInclude Include="PacketHandler.h">
-      <Filter>Protocol</Filter>
-    </ClInclude>
     <ClInclude Include="SendBuffer.h">
       <Filter>NetWork</Filter>
     </ClInclude>
@@ -97,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandler.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

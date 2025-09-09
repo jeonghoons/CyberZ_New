@@ -140,13 +140,13 @@ int main()
 					window.close();
 					break;
 				}
-				/*if (-1 != direction) {
+				if (-1 != direction) {
 					CS_MOVE_PACKET p;
-					p.size = sizeof(p);
-					p.type = CS_MOVE;
+					p.header.size = sizeof(p);
+					p.header.type = CS_MOVE;
 					p.direction = direction;
-					send_packet(&p);
-				}*/
+					network.Send_packet(&p);
+				}
 
 			}
 		}

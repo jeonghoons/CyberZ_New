@@ -11,7 +11,7 @@ enum SC_PACKET_LIST : unsigned char
 
 enum CS_PACKET_LIST : unsigned char
 {
-	CS_LOGIN, CS_LOGOUT, CS_CHAT
+	CS_LOGIN, CS_LOGOUT, CS_CHAT, CS_MOVE
 };
 // =======================
 
@@ -75,6 +75,7 @@ struct SC_CHAT_PACKET {
 
 struct SC_MOVE_PACKET {
 	PacketHeader header;
+	int				id;
 	std::pair<int, int> position;
 };
 

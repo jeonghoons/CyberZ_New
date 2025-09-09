@@ -56,6 +56,43 @@ void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
 	}
 }
 
+void Room::PlayerMove(shared_ptr<Player> player, int direction)
+{
+	pair<int, int> pos = player->GetPosition();
+
+	switch (direction)
+	{
+	case 2: // left
+		pos.first -= 1;
+		break;
+	case 3: // right
+		pos.first += 1;
+		break;
+	case 0: // up
+		pos.second -= 1;
+		break;
+	case 1: // down
+		pos.second += 1;
+		break;
+
+	default:
+		cout << "Move Error" << endl;
+		break;
+	}
+
+	player->SetPosition(pos);
+
+	SC_MOVE_PACKET packet;
+	packet.header = { sizeof(packet), SC_MOVE_OBJECT };
+	packet.id = player->GetSession()->GetId();
+	packet.position = player->GetPosition();
+
+	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(sizeof(packet));
+	sendBuffer->CopyData(&packet, sizeof(packet));
+	Broadcast(sendBuffer);
+
+}
+
 pair<int, int> Room::RandomPos()
 {
 	static std::random_device rd;

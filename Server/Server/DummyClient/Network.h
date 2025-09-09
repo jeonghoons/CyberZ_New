@@ -115,10 +115,37 @@ public:
 			break;
 
 		case SC_PACKET_LIST::SC_REMOVE_PLAYER:
+		{
 			cout << "DELETE PLAYER " << io_byte << "Bytes " << endl;
+			SC_REMOVE_PLAYER_PACKET* packet = reinterpret_cast<SC_REMOVE_PLAYER_PACKET*>(net_buf);
+			int id = packet->playerId;
+
+			auto it = players.find(id);
+			if (it != players.end())
+				players.erase(it);
+		}
 			break;
 
 		case SC_PACKET_LIST::SC_MOVE_OBJECT:
+		{
+			cout << "MOVE OBJECT " << io_byte << "Bytes " << endl;
+			SC_MOVE_PACKET* packet = reinterpret_cast<SC_MOVE_PACKET*>(net_buf);
+			int id = packet->id;
+			auto pos = packet->position;
+			int posX = pos.first;
+			int posY = pos.second;
+
+			if (id == g_myid) {
+				
+				myPlayer.SetPosition(posX, posY);
+				g_left_x = posX - SCREEN_WIDTH / 2;
+				g_top_y = posY - SCREEN_HEIGHT / 2;
+			}
+			else {
+				players[id].SetPosition(posX, posY);
+			}
+		}
+		break;
 
 		case SC_PACKET_LIST::SC_CHAT:
 			cout << "Chatting " << io_byte << "Bytes " << endl;
