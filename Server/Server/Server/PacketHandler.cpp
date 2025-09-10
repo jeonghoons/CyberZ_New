@@ -9,9 +9,11 @@ bool Handle_CS_LOGIN(shared_ptr<Session> session, CS_LOGIN_PACKET* packet)
 	// DB ¶Ç´Â ·£´ý
 	int playerId = session->GetId();
 	shared_ptr<Player> player = make_shared<Player>(session);
+	session->_currPlayer = player;
 
-	GRoom->EnterRoom(player);
+	// GRoom->EnterRoom(player);
 
+	GRoomManager->EnterPlayer(player);
 
 	return true;
 }
@@ -31,18 +33,22 @@ bool Handle_CS_CHAT(shared_ptr<Session> session, CS_CHAT_PACKET* packet)
 	cPacket.header.size = packet->header.size;
 	cPacket.header.type = SC_PACKET_LIST::SC_CHAT;
 
-	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(4096);
+	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(cPacket.header.size);
 	sendBuffer->CopyData(&cPacket, cPacket.header.size);
 
 	
-	GRoom->Broadcast(sendBuffer);
+	// GRoom->Broadcast(sendBuffer);
 
 	return true;
 }
 
 bool Handle_CS_MOVE(shared_ptr<Session> session, CS_MOVE_PACKET* packet)
 {
-	GRoom->PlayerMove(GRoom->Id2Player(session->GetId()), packet->direction);
+	
+	// GRoom->PlayerMove(GRoom->Id2Player(session->GetId()), packet->direction, packet->move_time);
+	
+	auto room = session->_currPlayer->GetCurrentRoom();
+	room->PlayerMove(session->_currPlayer, packet->direction, packet->move_time);
 
 	return true;
 }
@@ -98,10 +104,13 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 
 bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
 {
+	shared_ptr<Player> player = session->_currPlayer;
+
 	SC_ADD_PLAYER_PACKET packet;
 	packet.header = { sizeof(packet), SC_ADD_PLAYER };
 	packet.player.id = session->GetId();
-	packet.player.position = GRoom->Id2Player(session->GetId())->GetPosition();
+	// packet.player.position = GRoom->Id2Player(session->GetId())->GetPosition();
+	packet.player.position = player->GetPosition();
 	buffer->CopyData(&packet, packet.header.size);
 
 	return true;

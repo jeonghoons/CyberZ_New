@@ -4,12 +4,35 @@
 #include "Player.h"
 #include "PacketHandler.h"
 
-shared_ptr<Room> GRoom = make_shared<Room>();
+// shared_ptr<Room> GRoom = make_shared<Room>();
+shared_ptr<RoomManager> GRoomManager = make_shared<RoomManager>();
+
+void Room::InitRoom()
+{
+	/*_tileMap.reserve(400);
+	for (int i = 0; i < _tileMap.size(); ++i) {
+		for (int j = 0; j < _tileMap.size(); ++j) {
+			_tileMap[i].push_back(true);
+			_tileMap[i]
+		}
+	}*/
+
+	for (int i = 0; i < 100; ++i) {
+		shared_ptr<GameObject> monster = make_shared<GameObject>(shared_from_this());
+		monster->SetPosition(RandomPos());
+		_objects[i] = monster;
+	}
+}
+
+
 
 void Room::EnterRoom(shared_ptr<Player> player)
 {
 	int p_id = player->GetSession()->GetId();
 	_players[p_id] = player;	
+
+	player->SetOwnerRoom(shared_from_this());
+
 	player->SetPosition(RandomPos());
 
 	SC_LOGIN_INFO_PACKET logInPacket;
@@ -46,6 +69,7 @@ void Room::LeaveRoom(shared_ptr<Player> player)
 	Broadcast(sendBuffer);
 
 	_players.erase(player->GetSession()->GetId());
+	
 }
 
 void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
@@ -56,9 +80,15 @@ void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
 	}
 }
 
-void Room::PlayerMove(shared_ptr<Player> player, int direction)
+void Room::Update()
+{
+
+}
+
+void Room::PlayerMove(shared_ptr<Player> player, int direction, unsigned move_time)
 {
 	pair<int, int> pos = player->GetPosition();
+	player->_last_moveTime = move_time;
 
 	switch (direction)
 	{
@@ -86,6 +116,7 @@ void Room::PlayerMove(shared_ptr<Player> player, int direction)
 	packet.header = { sizeof(packet), SC_MOVE_OBJECT };
 	packet.id = player->GetSession()->GetId();
 	packet.position = player->GetPosition();
+	packet.move_time = player->_last_moveTime;
 
 	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(sizeof(packet));
 	sendBuffer->CopyData(&packet, sizeof(packet));
@@ -93,14 +124,63 @@ void Room::PlayerMove(shared_ptr<Player> player, int direction)
 
 }
 
+void Room::RandomMove()
+{
+
+}
+
 pair<int, int> Room::RandomPos()
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	static std::uniform_int_distribution<int> dist(0, 10);
+	static std::uniform_int_distribution<int> dist(0, 4);
 
 	int x = dist(gen);
 	int y = dist(gen);
 
 	return { x, y };
+}
+
+void RoomManager::CreateRoom()
+{
+	int id = IdGenerator();
+	
+	shared_ptr<Room> room = make_shared<Room>();
+	_rooms.insert({ id, room });
+}
+
+void RoomManager::Remove(int roomId)
+{
+	RWLock::WriteGuard lock(_lock);
+	_rooms.erase(roomId);
+}
+
+void RoomManager::Remove(shared_ptr<Room> room)
+{
+	return;
+}
+
+void RoomManager::EnterPlayer(shared_ptr<Player> player)
+{
+
+	for (auto it = _rooms.begin(); it != _rooms.end(); ++it) {
+		if(it->second->NumPlayers() < 2) {
+			RWLock::WriteGuard lock(_lock);
+			it->second->EnterRoom(player);
+			break;
+		}
+	}
+
+	if (player->GetCurrentRoom() == nullptr) {
+		CreateRoom();
+		EnterPlayer(player);
+	}
+
+
+}
+
+int RoomManager::IdGenerator()
+{
+	static atomic<int> _idGenerator = 0;
+	return ++_idGenerator;
 }

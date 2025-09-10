@@ -2,6 +2,7 @@
 #include "thread"
 #include "ServerService.h"
 #include "IocpCore.h"
+#include "Room.h"
 
 void worker_thread(shared_ptr<ServerService>& service)
 {
@@ -23,9 +24,11 @@ int main()
 		exit(-1);
 	}
 
+	
+	GRoomManager->CreateRoom();
 
 	vector<thread> _threads;
-	int num_threads = 1;
+	int num_threads = 4;
 	for (int i = 0; i < num_threads; ++i) {
 		_threads.emplace_back(worker_thread, std::ref(service));
 	}

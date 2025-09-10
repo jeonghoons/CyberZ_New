@@ -6,7 +6,7 @@
 #include "SendBuffer.h"
 
 class ServerService;
-
+class Player;
 
 class Session : public IocpObject
 {
@@ -45,12 +45,14 @@ private:
 	void			ProcessSend(int numOfBytes);
 
 public:
-	mutex		_lock;
+	RWLock		_lock;
 	RecvBuffer	_recvBuffer;
 	
 
 	queue<shared_ptr<SendBuffer>> _sendQueue;
 	atomic<bool>		_sendRegistered = false;
+
+	shared_ptr<Player>	_currPlayer;
 
 private:
 	weak_ptr<ServerService> _service;

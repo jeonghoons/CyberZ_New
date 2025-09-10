@@ -41,13 +41,14 @@ shared_ptr<Session> ServerService::CreateSession()
 
 void ServerService::AddSession(shared_ptr<Session> session)
 {
-	lock_guard lock(_lock);
+	RWLock::WriteGuard lock(_lock);
 	_sessions.emplace_back(session);
+	
 }
 
 void ServerService::ReleaseSession(shared_ptr<Session> session)
 {
-	lock_guard lock(_lock);
+	RWLock::WriteGuard lock(_lock);
 	auto it = find(_sessions.begin(), _sessions.end(), session);
 	if (it == _sessions.end()) {
 		cout << "Error" << endl;

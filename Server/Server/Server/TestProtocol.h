@@ -3,6 +3,8 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
+#define PORT_NUM 8888
+
 // Packet Key
 enum SC_PACKET_LIST : unsigned char
 {
@@ -49,7 +51,8 @@ struct CS_CHAT_PACKET {
 
 struct CS_MOVE_PACKET {
 	PacketHeader header;
-	int			direction;
+	int			direction; // 0 : UP, 1 : DOWN, 2 : LEFT, 3 : RIGHT
+	unsigned	move_time;
 };
 
 // ------------------------------------------
@@ -77,6 +80,7 @@ struct SC_MOVE_PACKET {
 	PacketHeader header;
 	int				id;
 	std::pair<int, int> position;
+	unsigned int move_time;
 };
 
 

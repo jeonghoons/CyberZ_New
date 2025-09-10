@@ -45,7 +45,7 @@ void Session::Dispatch(IocpEvent* iocpEvent, int numBytes)
 void Session::OnConnected()
 {
 	_connected.store(true);
-	cout << "Client[" << _cid << "] Connected " << endl;
+	cout << "Client[" << _cid << "] Connected" << endl;
 
 	GetService()->AddSession(static_pointer_cast<Session>(shared_from_this()));
 	
@@ -59,7 +59,9 @@ void Session::Disconnect(const WCHAR* cause)
 
 	GetService()->ReleaseSession(static_pointer_cast<Session>(shared_from_this()));
 
-	GRoom->LeaveRoom(GRoom->Id2Player(_cid));
+	// GRoom->LeaveRoom(GRoom->Id2Player(_cid));
+	_currPlayer->GetCurrentRoom()->LeaveRoom(_currPlayer);
+	_currPlayer = nullptr;
 	
 	wcout << "DisConnect :" << cause << endl;
 }
@@ -67,15 +69,20 @@ void Session::Disconnect(const WCHAR* cause)
 
 void Session::Send(shared_ptr<SendBuffer> sendBuffer)
 {
-	_lock.lock();
-	_sendQueue.push(sendBuffer);
+	if (false == IsConnected())
+		return;
 
-	if (_sendRegistered == false) {
-		_sendRegistered = true;
-		RegisterSend();
+
+	{
+		RWLock::WriteGuard lock(_lock);
+		_sendQueue.push(sendBuffer);
+
+		if (_sendRegistered == false) {
+			_sendRegistered = true;
+			RegisterSend();
+		}
 	}
 
-	_lock.unlock();
 }
 
 int Session::ProcessData(BYTE* buffer, int len)
@@ -174,7 +181,7 @@ void Session::RegisterSend()
 	_sendEvent.Init();
 	_sendEvent.owner = shared_from_this();
 
-	// _lock.lock();
+	
 	int writeSize = 0;
 	while (_sendQueue.empty() == false)
 	{
@@ -184,7 +191,7 @@ void Session::RegisterSend()
 		_sendQueue.pop();
 		_sendEvent.sendBuffers.push_back(sendBuffer);
 	}
-	// _lock.unlock();
+	
 
 	vector<WSABUF> wsaBufs;
 	wsaBufs.reserve(_sendEvent.sendBuffers.size());
@@ -215,7 +222,7 @@ void Session::ProcessSend(int numOfBytes)
 	_sendEvent.owner = nullptr;
 	_sendEvent.sendBuffers.clear();
 	// ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
-	cout << "Send " << numOfBytes << " Bytes" << endl;
+	// cout << "Send " << numOfBytes << " Bytes" << endl;
 
 	if (numOfBytes == 0)
 	{
@@ -223,12 +230,11 @@ void Session::ProcessSend(int numOfBytes)
 		return;
 	}
 
-	_lock.lock();
+	RWLock::WriteGuard lock(_lock);
 	if (_sendQueue.empty())
 		_sendRegistered.store(false);
 	else
 		RegisterSend();
-	_lock.unlock();
 }
 
 

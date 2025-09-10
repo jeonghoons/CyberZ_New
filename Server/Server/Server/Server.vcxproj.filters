@@ -57,6 +57,12 @@
     <ClCompile Include="PacketHandler.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="RWLock.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -97,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="PacketHandler.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="RWLock.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

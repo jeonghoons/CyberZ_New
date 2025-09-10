@@ -21,7 +21,7 @@ public:
 	void			ReleaseSession(shared_ptr<Session> session);
 
 private:
-	mutex					_lock;
+	RWLock					_lock;
 
 	shared_ptr<Listener>		_listener;
 	NetAddress				_netAddress;
