@@ -21,10 +21,10 @@ public:
 
 public:
 	void		SetService(shared_ptr<ServerService> service) { _service = service; }
-	shared_ptr<ServerService> GetService() { return _service.lock(); }
+	shared_ptr<ServerService> GetService() 	{return _service.lock();	}
 	SOCKET	GetSocket() { return _socket; }
 	void		SetNetAddress(NetAddress address) { _netAddress = address; }
-	bool		IsConnected() { return _connected; }
+	bool		IsConnected() { return _connected.load(); }
 	void		SetId(int num) { _cid = num; }
 	int		GetId() { return _cid; }
 

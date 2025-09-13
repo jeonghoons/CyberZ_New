@@ -8,9 +8,15 @@ bool Handle_CS_LOGIN(shared_ptr<Session> session, CS_LOGIN_PACKET* packet)
 {
 	// DB ¶Ç´Â ·£´ý
 	int playerId = session->GetId();
-	shared_ptr<Player> player = make_shared<Player>(session);
-	session->_currPlayer = player;
+	/*shared_ptr<Player> player = make_shared<Player>(session);
+	session->_currPlayer = player;*/
 
+	shared_ptr<Player> player = make_shared<Player>();
+	player->SetId(playerId);
+	
+	player->SetOwnerSession(session);
+	session->_currPlayer = player;
+	
 	// GRoom->EnterRoom(player);
 
 	GRoomManager->EnterPlayer(player);
@@ -47,8 +53,9 @@ bool Handle_CS_MOVE(shared_ptr<Session> session, CS_MOVE_PACKET* packet)
 	
 	// GRoom->PlayerMove(GRoom->Id2Player(session->GetId()), packet->direction, packet->move_time);
 	
-	auto room = session->_currPlayer->GetCurrentRoom();
-	room->PlayerMove(session->_currPlayer, packet->direction, packet->move_time);
+	shared_ptr<Player> player = session->_currPlayer;
+	if(auto room = session->_currPlayer->GetCurrentRoom())
+		room->PlayerMove(player, packet->direction, packet->move_time);
 
 	return true;
 }
@@ -104,11 +111,11 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 
 bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
 {
-	shared_ptr<Player> player = session->_currPlayer;
+	auto player = session->_currPlayer;
 
 	SC_ADD_PLAYER_PACKET packet;
 	packet.header = { sizeof(packet), SC_ADD_PLAYER };
-	packet.player.id = session->GetId();
+	packet.player.id = player->GetId();
 	// packet.player.position = GRoom->Id2Player(session->GetId())->GetPosition();
 	packet.player.position = player->GetPosition();
 	buffer->CopyData(&packet, packet.header.size);
@@ -118,9 +125,10 @@ bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buff
 
 bool MAKE_SC_REMOVE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer)
 {
+	auto player = session->_currPlayer;
 	SC_REMOVE_PLAYER_PACKET packet;
 	packet.header = { sizeof(packet), SC_REMOVE_PLAYER };
-	packet.playerId = session->GetId();
+	packet.playerId = player->GetId();
 	buffer->CopyData(&packet, packet.header.size);
 	return true;
 }

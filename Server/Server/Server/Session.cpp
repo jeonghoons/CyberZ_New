@@ -59,9 +59,8 @@ void Session::Disconnect(const WCHAR* cause)
 
 	GetService()->ReleaseSession(static_pointer_cast<Session>(shared_from_this()));
 
-	// GRoom->LeaveRoom(GRoom->Id2Player(_cid));
+	
 	_currPlayer->GetCurrentRoom()->LeaveRoom(_currPlayer);
-	_currPlayer = nullptr;
 	
 	wcout << "DisConnect :" << cause << endl;
 }
@@ -230,11 +229,13 @@ void Session::ProcessSend(int numOfBytes)
 		return;
 	}
 
-	RWLock::WriteGuard lock(_lock);
-	if (_sendQueue.empty())
-		_sendRegistered.store(false);
-	else
-		RegisterSend();
+	{
+		RWLock::WriteGuard lock(_lock);
+		if (_sendQueue.empty())
+			_sendRegistered.store(false);
+		else
+			RegisterSend();
+	}
 }
 
 

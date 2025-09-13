@@ -28,7 +28,7 @@ int main()
 	GRoomManager->CreateRoom();
 
 	vector<thread> _threads;
-	int num_threads = 4;
+	int num_threads = 8;
 	for (int i = 0; i < num_threads; ++i) {
 		_threads.emplace_back(worker_thread, std::ref(service));
 	}

@@ -29,6 +29,5 @@ private:
 	
 	vector<shared_ptr<Session>> _sessions;
 
-	vector<shared_ptr<Room>>	_Rooms;
 };
 

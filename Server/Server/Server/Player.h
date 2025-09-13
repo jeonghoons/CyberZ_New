@@ -12,19 +12,25 @@ public:
 	Player(shared_ptr<Session> ownerSession);
 	~Player() = default;
 
-	shared_ptr<Session> GetSession() const { return _ownerSession.lock(); }
-	void SetOwnerRoom(shared_ptr<Room> room) { _ownerRoom = room; }
-	shared_ptr<Room> GetCurrentRoom() { return _ownerRoom.lock(); }
-
-	void SetPosition(pair<int, int> position) { _position = position; }
-	pair<int, int> GetPosition() const { return _position; }
-	unsigned _last_moveTime{};
+	shared_ptr<Session> GetSession()
+	{
+		auto s = _ownerSession.lock();
+		if (s) {
+			/*std::cout << "[Warning] Player::GetSession(): session expired!" << std::endl;
+			OutputDebugStringA("[Warning] Player::GetSession(): session expired!\n");
+			__debugbreak();*/
+			return s;
+		}
+		else
+			return nullptr;
+	}
+	void SetOwnerSession(shared_ptr<Session> session) { _ownerSession = session; }
+	
+	
 
 private:
 	weak_ptr<Session> _ownerSession;
-	pair<int, int> _position = {};
-
-	weak_ptr<Room>	_ownerRoom;
+	
 	// map<int>		_viewList;
 };
 

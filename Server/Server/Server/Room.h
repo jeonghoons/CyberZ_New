@@ -18,7 +18,7 @@ public:
 
 	void Update();
 	void PlayerMove(shared_ptr<Player> player, int direction, unsigned move_time);
-	void RandomMove();
+	void NPCMove();
 
 	shared_ptr<Player> Id2Player(int pId) { return _players[pId]; }
 
@@ -26,6 +26,7 @@ public:
 
 	int NumPlayers() { return _players.size(); }
 
+	RWLock		_lock;
 private:
 	/// <vector<bool>> _tileMap;
 	map<int, shared_ptr<GameObject>> _objects;

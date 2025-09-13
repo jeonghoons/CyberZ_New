@@ -63,6 +63,7 @@
     <ClCompile Include="RWLock.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="Job.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -110,5 +111,6 @@
     <ClInclude Include="RWLock.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Job.h" />
   </ItemGroup>
 </Project>

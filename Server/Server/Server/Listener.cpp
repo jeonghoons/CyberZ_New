@@ -91,7 +91,6 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	session->OnConnected();
 
 	
-	//
 
 	RegisterAccept(acceptEvent);
 }

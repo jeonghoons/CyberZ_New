@@ -25,11 +25,14 @@ bool ServerService::Start()
 	if (_listener->StartAccept(service) == false)
 		return false;
 
+	_sessions.reserve(10000);
+
 	return true;
 }
 
 shared_ptr<Session> ServerService::CreateSession()
 {
+	
 	shared_ptr<Session> session = make_shared<Session>();
 	session->SetService(shared_from_this());
 

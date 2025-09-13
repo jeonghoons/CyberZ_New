@@ -1,10 +1,11 @@
 #pragma once
 
-enum class EventType : UINT8
+enum class EventType : unsigned char
 {
 	Accept,
 	Recv,
-	Send
+	Send,
+	Do_Job
 };
 
 class IocpEvent : public OVERLAPPED
@@ -46,3 +47,10 @@ public:
 	vector<shared_ptr<SendBuffer>> sendBuffers;
 };
 
+class JobEvent : public IocpEvent
+{
+public:
+	JobEvent() : IocpEvent(EventType::Do_Job) {}
+
+
+};

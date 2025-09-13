@@ -28,16 +28,18 @@ void Room::InitRoom()
 
 void Room::EnterRoom(shared_ptr<Player> player)
 {
-	int p_id = player->GetSession()->GetId();
-	_players[p_id] = player;	
+	{
+		RWLock::WriteGuard lock(_lock);
+		player->SetOwnerRoom(shared_from_this());
+		player->SetPosition(RandomPos());
+		_players[player->GetId()] = player;
 
-	player->SetOwnerRoom(shared_from_this());
-
-	player->SetPosition(RandomPos());
+	}
+	
 
 	SC_LOGIN_INFO_PACKET logInPacket;
 	logInPacket.header = { sizeof(SC_LOGIN_INFO_PACKET), SC_LOGIN };
-	logInPacket.player.id = p_id;
+	logInPacket.player.id = player->GetId();
 	logInPacket.player.position = player->GetPosition();
 
 	shared_ptr<SendBuffer> sendBuffer = make_shared<SendBuffer>(sizeof(logInPacket));
@@ -58,7 +60,7 @@ void Room::EnterRoom(shared_ptr<Player> player)
 			continue;
 		p.second->GetSession()->Send(PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_ADD_PLAYER));
 	}
-	
+
 
 }
 
@@ -68,13 +70,15 @@ void Room::LeaveRoom(shared_ptr<Player> player)
 	shared_ptr<SendBuffer> sendBuffer = PacketHandler::MakePacket(player->GetSession(), SC_PACKET_LIST::SC_REMOVE_PLAYER);
 	Broadcast(sendBuffer);
 
-	_players.erase(player->GetSession()->GetId());
-	
+	RWLock::WriteGuard lock(_lock);
+	_players.erase(player->GetId());
+
 }
 
 void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
 {
-	for (auto& p : _players)
+	RWLock::ReadGuard lock(_lock);
+	for (const auto& p : _players)
 	{
 		p.second->GetSession()->Send(sendBuffer);
 	}
@@ -124,7 +128,7 @@ void Room::PlayerMove(shared_ptr<Player> player, int direction, unsigned move_ti
 
 }
 
-void Room::RandomMove()
+void Room::NPCMove()
 {
 
 }
@@ -144,7 +148,7 @@ pair<int, int> Room::RandomPos()
 void RoomManager::CreateRoom()
 {
 	int id = IdGenerator();
-	
+
 	shared_ptr<Room> room = make_shared<Room>();
 	_rooms.insert({ id, room });
 }
@@ -162,21 +166,23 @@ void RoomManager::Remove(shared_ptr<Room> room)
 
 void RoomManager::EnterPlayer(shared_ptr<Player> player)
 {
-
-	for (auto it = _rooms.begin(); it != _rooms.end(); ++it) {
-		if(it->second->NumPlayers() < 2) {
-			RWLock::WriteGuard lock(_lock);
-			it->second->EnterRoom(player);
-			break;
+	{
+		RWLock::WriteGuard lock(_lock);
+		for (auto it = _rooms.begin(); it != _rooms.end(); ++it) {
+			if (it->second->NumPlayers() < MAX_ROOM_CAPACITY) {
+				it->second->EnterRoom(player);
+				break;
+			}
 		}
+
+
+		if (player->GetCurrentRoom() == nullptr) {
+
+			CreateRoom();
+			EnterPlayer(player);
+		}
+
 	}
-
-	if (player->GetCurrentRoom() == nullptr) {
-		CreateRoom();
-		EnterPlayer(player);
-	}
-
-
 }
 
 int RoomManager::IdGenerator()

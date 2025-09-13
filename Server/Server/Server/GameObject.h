@@ -8,14 +8,20 @@ public:
 	GameObject() = default;
 	GameObject(shared_ptr<Room> room);
 
+public:
+	shared_ptr<Room> GetCurrentRoom() const { return _ownerRoom.lock(); }
+	void SetOwnerRoom(shared_ptr<Room> room) { _ownerRoom = room; }
 
-	shared_ptr<Room> GetRoom() { return _ownerRoom.lock(); }
 	pair<int, int> GetPosition() const { return _position; }
 	void SetPosition(pair<int, int> position) { _position = position; }
 
+	int GetId() const { return _oId; }
+	void SetId(int id) { _oId = id; }
 
+	unsigned _last_moveTime{};
 
-private:
+protected:
+	int				_oId{};
 	pair<int, int> _position = {};
 	weak_ptr<Room> _ownerRoom;
 };

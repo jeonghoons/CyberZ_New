@@ -4,6 +4,7 @@
 using namespace DirectX;
 
 #define PORT_NUM 8888
+constexpr int MAX_ROOM_CAPACITY = 20000;
 
 // Packet Key
 enum SC_PACKET_LIST : unsigned char
