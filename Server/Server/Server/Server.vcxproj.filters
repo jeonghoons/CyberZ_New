@@ -64,6 +64,10 @@
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Job.cpp" />
+    <ClCompile Include="Monster.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -112,5 +116,9 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Job.h" />
+    <ClInclude Include="Monster.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerQueue.h" />
   </ItemGroup>
 </Project>

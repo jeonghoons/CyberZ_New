@@ -25,7 +25,7 @@ bool ServerService::Start()
 	if (_listener->StartAccept(service) == false)
 		return false;
 
-	_sessions.reserve(10000);
+	// _sessions.reserve(10000);
 
 	return true;
 }

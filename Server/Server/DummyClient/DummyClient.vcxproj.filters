@@ -34,7 +34,9 @@
     <ClCompile Include="Object.cpp">
       <Filter>GameContents</Filter>
     </ClCompile>
-    <ClCompile Include="framework.cpp" />
+    <ClCompile Include="framework.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.h">
@@ -49,7 +51,9 @@
     <ClInclude Include="Object.h">
       <Filter>GameContents</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="framework.h">
+      <Filter>Main</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

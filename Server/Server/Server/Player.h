@@ -10,7 +10,7 @@ class Player :public GameObject
 public:
 	Player() = default;
 	Player(shared_ptr<Session> ownerSession);
-	~Player() = default;
+	virtual ~Player() = default;
 
 	shared_ptr<Session> GetSession()
 	{

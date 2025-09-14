@@ -5,6 +5,7 @@ class Session;
 class SendBuffer;
 class GameObject;
 class Player;
+class Monster;
 
 class Room : public enable_shared_from_this<Room>
 {
@@ -15,10 +16,17 @@ public:
 	void LeaveRoom(shared_ptr<Player> player);
 	void Broadcast(shared_ptr<SendBuffer> sendBuffer);
 
+	bool AddObject(shared_ptr<Monster> object);
+	bool RemoveObject(int objectId);
 
 	void Update();
 	void PlayerMove(shared_ptr<Player> player, int direction, unsigned move_time);
 	void NPCMove();
+	int MonsterIdGenerator()
+	{
+		static atomic<int> _midGenerator = 10000;
+		return ++_midGenerator;
+	}
 
 	shared_ptr<Player> Id2Player(int pId) { return _players[pId]; }
 
@@ -32,7 +40,7 @@ private:
 	map<int, shared_ptr<GameObject>> _objects;
 
 	map<int, shared_ptr<Player>> _players;
-
+	map<int, shared_ptr<Monster>> _monsters;
 	
 };
 

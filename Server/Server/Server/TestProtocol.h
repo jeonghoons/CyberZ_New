@@ -9,7 +9,8 @@ constexpr int MAX_ROOM_CAPACITY = 20000;
 // Packet Key
 enum SC_PACKET_LIST : unsigned char
 {
-	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_REMOVE_PLAYER, SC_CHAT, SC_MOVE_OBJECT, 
+	SC_LOGIN, SC_LOGOUT, SC_ADD_PLAYER, SC_REMOVE_PLAYER, 
+	SC_CHAT, SC_MOVE_OBJECT, SC_ADD_OBJECT, SC_REMOVE_OBJECT
 };
 
 enum CS_PACKET_LIST : unsigned char
@@ -82,6 +83,17 @@ struct SC_MOVE_PACKET {
 	int				id;
 	std::pair<int, int> position;
 	unsigned int move_time;
+};
+
+struct SC_ADD_OBJECT_PACKET {
+	PacketHeader header;
+	int				objectId;
+	std::pair<int, int> position;
+};
+
+struct SC_REMOVE_OBJECT_PACKET {
+	PacketHeader header;
+	int				objectId;
 };
 
 

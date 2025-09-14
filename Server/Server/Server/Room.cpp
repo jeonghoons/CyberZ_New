@@ -1,26 +1,24 @@
 #include "pch.h"
 #include "Room.h"
 #include "Session.h"
-#include "Player.h"
 #include "PacketHandler.h"
+#include "Player.h"
+#include "Monster.h"
 
 // shared_ptr<Room> GRoom = make_shared<Room>();
 shared_ptr<RoomManager> GRoomManager = make_shared<RoomManager>();
 
+#include "TimerQueue.h"
+
 void Room::InitRoom()
 {
-	/*_tileMap.reserve(400);
-	for (int i = 0; i < _tileMap.size(); ++i) {
-		for (int j = 0; j < _tileMap.size(); ++j) {
-			_tileMap[i].push_back(true);
-			_tileMap[i]
-		}
-	}*/
+	
 
-	for (int i = 0; i < 100; ++i) {
-		shared_ptr<GameObject> monster = make_shared<GameObject>(shared_from_this());
-		monster->SetPosition(RandomPos());
-		_objects[i] = monster;
+	
+	for (int i = 0; i < 40; ++i) {
+		shared_ptr<Monster> monster = make_shared<Monster>();
+		monster->SetId(MonsterIdGenerator());
+		AddObject(monster);
 	}
 }
 
@@ -28,14 +26,11 @@ void Room::InitRoom()
 
 void Room::EnterRoom(shared_ptr<Player> player)
 {
-	{
-		RWLock::WriteGuard lock(_lock);
-		player->SetOwnerRoom(shared_from_this());
-		player->SetPosition(RandomPos());
-		_players[player->GetId()] = player;
-
-	}
 	
+	player->SetOwnerRoom(shared_from_this());
+	player->SetPosition(RandomPos());
+	_players[player->GetId()] = player;
+
 
 	SC_LOGIN_INFO_PACKET logInPacket;
 	logInPacket.header = { sizeof(SC_LOGIN_INFO_PACKET), SC_LOGIN };
@@ -62,6 +57,25 @@ void Room::EnterRoom(shared_ptr<Player> player)
 	}
 
 
+	int dataSize = sizeof(SC_ADD_OBJECT_PACKET) * _monsters.size();
+	vector<BYTE> buf(dataSize);
+	int bufIndex{};
+	
+	for (auto& [id, monster] : _monsters) {
+		SC_ADD_OBJECT_PACKET addPacket;
+		addPacket.header = { sizeof(addPacket), SC_ADD_OBJECT };
+		addPacket.objectId = id;
+		addPacket.position = monster->GetPosition();
+		memcpy(&buf[bufIndex], &addPacket, sizeof(addPacket));
+		bufIndex += sizeof(addPacket);
+	}
+
+	shared_ptr<SendBuffer> npcSendBuffer = make_shared<SendBuffer>(dataSize);
+	npcSendBuffer->CopyData(buf.data(), dataSize);
+
+	player->GetSession()->Send(npcSendBuffer);
+
+	Update();
 }
 
 void Room::LeaveRoom(shared_ptr<Player> player)
@@ -84,9 +98,26 @@ void Room::Broadcast(shared_ptr<SendBuffer> sendBuffer)
 	}
 }
 
+bool Room::AddObject(shared_ptr<Monster> object)
+{
+	RWLock::WriteGuard lock(_lock);
+	_monsters.insert(make_pair(object->GetId(), object));
+	object->SetOwnerRoom(shared_from_this());
+	object->SetPosition(RandomPos());
+
+	
+	return true;
+}
+
+bool Room::RemoveObject(int objectId)
+{
+	return false;
+}
+
 void Room::Update()
 {
-
+	TimerEvent ev{ std::chrono::system_clock::now() + std::chrono::milliseconds(1000), EV_NPC_MOVE };
+	GTimerQueue->_timerQueue.push(ev);
 }
 
 void Room::PlayerMove(shared_ptr<Player> player, int direction, unsigned move_time)
@@ -137,7 +168,7 @@ pair<int, int> Room::RandomPos()
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	static std::uniform_int_distribution<int> dist(0, 4);
+	static std::uniform_int_distribution<int> dist(0, 32);
 
 	int x = dist(gen);
 	int y = dist(gen);
@@ -151,6 +182,7 @@ void RoomManager::CreateRoom()
 
 	shared_ptr<Room> room = make_shared<Room>();
 	_rooms.insert({ id, room });
+	room->InitRoom();
 }
 
 void RoomManager::Remove(int roomId)
@@ -166,22 +198,24 @@ void RoomManager::Remove(shared_ptr<Room> room)
 
 void RoomManager::EnterPlayer(shared_ptr<Player> player)
 {
-	{
-		RWLock::WriteGuard lock(_lock);
-		for (auto it = _rooms.begin(); it != _rooms.end(); ++it) {
-			if (it->second->NumPlayers() < MAX_ROOM_CAPACITY) {
-				it->second->EnterRoom(player);
-				break;
+	while (true) {
+		{
+			RWLock::WriteGuard lock(_lock);
+
+			for (auto& [id, room] : _rooms) {
+				if (room->NumPlayers() < MAX_ROOM_CAPACITY) {
+					room->EnterRoom(player);
+					return; // 성공 시 바로 종료
+				}
 			}
-		}
 
-
-		if (player->GetCurrentRoom() == nullptr) {
-
+			// 빈 방이 없음 -> 새 방 생성
 			CreateRoom();
-			EnterPlayer(player);
 		}
 
+		// lock 해제된 상태에서 다시 while 재시도
+		// (CreateRoom에서 _rooms에 새로운 방 추가됨)
+		// 다음 루프에서 새로 생성된 방에 들어가게 됨
 	}
 }
 

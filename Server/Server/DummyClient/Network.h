@@ -101,8 +101,6 @@ public:
 			int posY = packet->player.position.second;
 
 			if (id == g_myid) {
-				int posX = packet->player.position.first;
-				int posY = packet->player.position.second;
 				myPlayer.SetPosition(posX, posY);
 				g_left_x = posX - SCREEN_WIDTH / 2;
 				g_top_y = posY - SCREEN_HEIGHT / 2;
@@ -113,6 +111,30 @@ public:
 			}
 		}
 			break;
+
+		case SC_PACKET_LIST::SC_ADD_OBJECT:
+		{
+			cout << "ADD MONSTER " << io_byte << "Bytes " << endl;
+
+			SC_ADD_OBJECT_PACKET* packet = reinterpret_cast<SC_ADD_OBJECT_PACKET*>(net_buf);
+			int id = packet->objectId;
+			int posX = packet->position.first;
+			int posY = packet->position.second;
+
+			players[id] = Object{ *pieces, 88, 0,TILE_WIDTH - 1, TILE_WIDTH - 1 };
+			players[id].SetPosition(posX, posY);
+		}break;
+
+		case SC_PACKET_LIST::SC_REMOVE_OBJECT:
+		{
+			cout << "DELETE MONSTER " << io_byte << "Bytes " << endl;
+			SC_REMOVE_OBJECT_PACKET* packet = reinterpret_cast<SC_REMOVE_OBJECT_PACKET*>(net_buf);
+			int id = packet->objectId;
+
+			auto it = players.find(id);
+			if (it != players.end())
+				players.erase(it);
+		}break;
 
 		case SC_PACKET_LIST::SC_REMOVE_PLAYER:
 		{

@@ -10,11 +10,12 @@ void Job::Dispatch(IocpEvent* iocpEvent, int numBytes)
 {
 	switch (iocpEvent->type)
 	{
-	case EventType::Recv:
-		
+	case EventType::Do_Job:
+		cout << "Do_Job" << endl;
 		break;
-	case EventType::Send:
-		
+	
+	case EventType::Do_Timer:
+		cout << "Do_Timer" << endl;
 		break;
 
 	default:

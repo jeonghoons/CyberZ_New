@@ -144,6 +144,7 @@
     <ClInclude Include="IocpEvent.h" />
     <ClInclude Include="Job.h" />
     <ClInclude Include="Listener.h" />
+    <ClInclude Include="Monster.h" />
     <ClInclude Include="NetAddress.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="PacketHandler.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="ServerService.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="TestProtocol.h" />
+    <ClInclude Include="TimerQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gameserver.cpp" />
@@ -163,6 +165,7 @@
     <ClCompile Include="IocpEvent.h.cpp" />
     <ClCompile Include="Job.cpp" />
     <ClCompile Include="Listener.cpp" />
+    <ClCompile Include="Monster.cpp" />
     <ClCompile Include="NetAddress.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="PacketHandler.cpp" />
@@ -179,6 +182,7 @@
     <ClCompile Include="SendBuffer.cpp" />
     <ClCompile Include="ServerService.cpp" />
     <ClCompile Include="Session.cpp" />
+    <ClCompile Include="TimerQueue.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

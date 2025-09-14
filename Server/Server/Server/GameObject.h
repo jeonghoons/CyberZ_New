@@ -7,6 +7,7 @@ class GameObject : public enable_shared_from_this<GameObject>
 public:
 	GameObject() = default;
 	GameObject(shared_ptr<Room> room);
+	virtual ~GameObject() = default;
 
 public:
 	shared_ptr<Room> GetCurrentRoom() const { return _ownerRoom.lock(); }

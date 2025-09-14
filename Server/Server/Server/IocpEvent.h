@@ -5,7 +5,8 @@ enum class EventType : unsigned char
 	Accept,
 	Recv,
 	Send,
-	Do_Job
+	Do_Job, 
+	Do_Timer,
 };
 
 class IocpEvent : public OVERLAPPED
@@ -51,6 +52,14 @@ class JobEvent : public IocpEvent
 {
 public:
 	JobEvent() : IocpEvent(EventType::Do_Job) {}
+
+
+};
+
+class DoTimerEvent : public IocpEvent
+{
+public:
+	DoTimerEvent() : IocpEvent(EventType::Do_Timer) {}
 
 
 };

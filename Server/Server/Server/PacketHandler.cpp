@@ -102,6 +102,7 @@ shared_ptr<SendBuffer> PacketHandler::MakePacket(shared_ptr<Session> session, SC
 		break;
 	case SC_CHAT:
 		break;
+	
 	default:
 		break;
 	}

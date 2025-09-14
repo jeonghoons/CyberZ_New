@@ -3,6 +3,7 @@
 #include "ServerService.h"
 #include "IocpCore.h"
 #include "Room.h"
+#include "TimerQueue.h"
 
 void worker_thread(shared_ptr<ServerService>& service)
 {
@@ -10,6 +11,11 @@ void worker_thread(shared_ptr<ServerService>& service)
 	{
 		service->GetIocpInstance()->Dispatch();
 	}
+}
+
+void timer_Thread(shared_ptr<ServerService>& service)
+{
+	GTimerQueue->TimerRun(service);
 }
 
 int main()
@@ -23,17 +29,24 @@ int main()
 		cout << "Can't Start" << endl;
 		exit(-1);
 	}
+	else
+		cout << "Service Start" << endl;
 
 	
 	GRoomManager->CreateRoom();
 
-	vector<thread> _threads;
+	GTimerQueue->GetInstance(service);
+
+	vector<thread> threads;
 	int num_threads = 8;
 	for (int i = 0; i < num_threads; ++i) {
-		_threads.emplace_back(worker_thread, std::ref(service));
+		threads.emplace_back(worker_thread, std::ref(service));
 	}
-
-	for (thread& t : _threads) {
+	
+	thread timerThread{ timer_Thread, std::ref(service) };
+	
+	timerThread.join();
+	for (thread& t : threads) {
 		t.join();
 	}
 
