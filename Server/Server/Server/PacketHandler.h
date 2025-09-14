@@ -14,11 +14,12 @@ class PacketHandler
 public:
 
 	static bool ProcessPacket(shared_ptr<Session> session, BYTE* buffer, int len);
-	static shared_ptr<SendBuffer> MakePacket(shared_ptr<Session> session, SC_PACKET_LIST type);
+	static shared_ptr<SendBuffer> MakePacket(shared_ptr<Player> player, SC_PACKET_LIST type);
 };
 
 // bool MAKE_SC_LOGIN(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
-bool MAKE_SC_ADD_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
-bool MAKE_SC_REMOVE_PLAYER(shared_ptr<Session> session, shared_ptr<SendBuffer> buffer);
+bool MAKE_SC_ADD_PLAYER(shared_ptr<Player> player, shared_ptr<SendBuffer> buffer);
+bool MAKE_SC_REMOVE_PLAYER(shared_ptr<Player> player, shared_ptr<SendBuffer> buffer);
+bool MAKE_SC_MOVE_OBJECT(shared_ptr<Player> player, shared_ptr<SendBuffer> buffer);
 
 

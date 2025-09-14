@@ -3,8 +3,9 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
+
 #define PORT_NUM 8888
-constexpr int MAX_ROOM_CAPACITY = 20000;
+constexpr int MAX_ROOM_CAPACITY = 60;
 
 // Packet Key
 enum SC_PACKET_LIST : unsigned char
@@ -22,8 +23,8 @@ enum CS_PACKET_LIST : unsigned char
 #pragma pack (push, 1)
 struct PacketHeader
 {
-	unsigned short size;
-	unsigned short type;
+	unsigned short size{};
+	unsigned short type{};
 };
 
 struct PlayerInfo

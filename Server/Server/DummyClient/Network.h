@@ -106,7 +106,7 @@ public:
 				g_top_y = posY - SCREEN_HEIGHT / 2;
 			}
 			else {
-				players[id] = Object{ *pieces, 44, 0,TILE_WIDTH - 1, TILE_WIDTH - 1 };
+				players[id] = Object{ *pieces, 180-1, 0,TILE_WIDTH - 1, TILE_WIDTH - 1 };
 				players[id].SetPosition(posX, posY);
 			}
 		}

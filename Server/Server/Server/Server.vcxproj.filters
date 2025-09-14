@@ -63,11 +63,12 @@
     <ClCompile Include="RWLock.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Job.cpp" />
     <ClCompile Include="Monster.cpp">
       <Filter>Contents</Filter>
     </ClCompile>
-    <ClCompile Include="TimerQueue.cpp" />
+    <ClCompile Include="TimerQueue.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -115,10 +116,11 @@
     <ClInclude Include="RWLock.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Job.h" />
     <ClInclude Include="Monster.h">
       <Filter>Contents</Filter>
     </ClInclude>
-    <ClInclude Include="TimerQueue.h" />
+    <ClInclude Include="TimerQueue.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

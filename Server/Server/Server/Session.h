@@ -29,7 +29,7 @@ public:
 	int		GetId() { return _cid; }
 
 public:
-	virtual void	OnConnected();
+	void			OnConnected();
 	void			Disconnect(const WCHAR* cause);
 
 	void			Send(shared_ptr<SendBuffer> sendBuffer);

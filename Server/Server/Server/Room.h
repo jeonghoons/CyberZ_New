@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include "IocpCore.h"
+
 
 class Session;
 class SendBuffer;
@@ -7,9 +9,15 @@ class GameObject;
 class Player;
 class Monster;
 
-class Room : public enable_shared_from_this<Room>
+class Room : public IocpObject
 {
 public:
+	Room() = default;
+	~Room() = default;
+	virtual HANDLE GetHandle() override;
+	virtual void Dispatch(class IocpEvent* iocpEvent, int numBytes = 0) override;
+
+
 	void InitRoom();
 	
 	void EnterRoom(shared_ptr<Player> player);
@@ -22,6 +30,9 @@ public:
 	void Update();
 	void PlayerMove(shared_ptr<Player> player, int direction, unsigned move_time);
 	void NPCMove();
+
+	bool canSee(int from, int to);
+
 	int MonsterIdGenerator()
 	{
 		static atomic<int> _midGenerator = 10000;
@@ -35,10 +46,11 @@ public:
 	int NumPlayers() { return _players.size(); }
 
 	RWLock		_lock;
+
 private:
 	/// <vector<bool>> _tileMap;
-	map<int, shared_ptr<GameObject>> _objects;
-
+	// map<int, shared_ptr<GameObject>> _objects;
+	RWLock			_vlLock;
 	map<int, shared_ptr<Player>> _players;
 	map<int, shared_ptr<Monster>> _monsters;
 	

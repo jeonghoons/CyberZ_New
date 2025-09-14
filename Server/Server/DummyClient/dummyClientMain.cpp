@@ -41,6 +41,8 @@ void client_initialize()
 		}
 	}
 
+	
+
 	g_font = new sf::Font();
 	if (false == g_font->loadFromFile("cour.ttf")) {
 		cout << "Font Loading Error!\n";
@@ -48,7 +50,7 @@ void client_initialize()
 	}
 	
 	
-	myPlayer = Object{ *pieces, 0, 0, TILE_WIDTH-1, TILE_WIDTH-1 };
+	myPlayer = Object{ *pieces, 44, 0, TILE_WIDTH-1, TILE_WIDTH-1 };
 	myPlayer.SetPosition(0, 0);
 		
 }

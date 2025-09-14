@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 #include <concurrent_priority_queue.h>
-#include "Job.h"
+#include "Room.h"
 #include "ServerService.h"
 
 enum Timer_EventType { EV_NPC_MOVE, EV_UPDATE_ROOM };
@@ -15,6 +15,7 @@ struct TimerEvent
 
 	std::chrono::system_clock::time_point _excuteTime;
 	Timer_EventType _type{};
+	shared_ptr<Room>	  _room;
 };
 
 class TimerQueue
@@ -36,25 +37,26 @@ public:
 				// ÆË ¼º°ø
 				switch (event._type)
 				{
-				case Timer_EventType::EV_NPC_MOVE: {
-					shared_ptr<Job> job = make_shared<Job>();
-					// job->_jobEvent = new JobEvent();
-					JobEvent* jobEvent = new JobEvent();
-					jobEvent->Init();
-					jobEvent->owner = job;
-
-					PostQueuedCompletionStatus(_iocpInstance->GetHandle(), 1, 0, reinterpret_cast<LPOVERLAPPED>(jobEvent));
-				}	break;
 
 				case Timer_EventType::EV_UPDATE_ROOM: {
-					shared_ptr<Job> job = make_shared<Job>();
-					// job->_jobEvent = new JobEvent();
-					JobEvent* jobEvent = new JobEvent();
-					jobEvent->Init(); 
-					jobEvent->owner = job;
+					shared_ptr<Room> room = event._room;
+					RoomUpdateEvent* roomEvent = new RoomUpdateEvent();
+					roomEvent->Init();
+					roomEvent->owner = room;
 
-					PostQueuedCompletionStatus(_iocpInstance->GetHandle(), 1, 0, reinterpret_cast<LPOVERLAPPED>(jobEvent));
+					PostQueuedCompletionStatus(_iocpInstance->GetHandle(), 1, 0, reinterpret_cast<LPOVERLAPPED>(roomEvent));
 				}	break;
+
+				case Timer_EventType::EV_NPC_MOVE: {
+					shared_ptr<Room> room = make_shared<Room>();
+					NpcMoveEvent* moveEvent = new NpcMoveEvent();
+					moveEvent->Init();
+					moveEvent->owner = room;
+
+					PostQueuedCompletionStatus(_iocpInstance->GetHandle(), 1, 0, reinterpret_cast<LPOVERLAPPED>(moveEvent));
+				}	break;
+
+
 				default:
 					break;
 				}

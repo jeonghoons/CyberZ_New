@@ -35,7 +35,7 @@ int main()
 	
 	GRoomManager->CreateRoom();
 
-	GTimerQueue->GetInstance(service);
+	// GTimerQueue->GetInstance(service);
 
 	vector<thread> threads;
 	int num_threads = 8;
@@ -43,9 +43,9 @@ int main()
 		threads.emplace_back(worker_thread, std::ref(service));
 	}
 	
-	thread timerThread{ timer_Thread, std::ref(service) };
+	// thread timerThread{ timer_Thread, std::ref(service) };
 	
-	timerThread.join();
+	// timerThread.join();
 	for (thread& t : threads) {
 		t.join();
 	}

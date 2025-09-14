@@ -57,10 +57,11 @@ void Session::Disconnect(const WCHAR* cause)
 	if (_connected.exchange(false) == false)
 		return;
 
+	_currPlayer->GetCurrentRoom()->LeaveRoom(_currPlayer);
+
 	GetService()->ReleaseSession(static_pointer_cast<Session>(shared_from_this()));
 
 	
-	_currPlayer->GetCurrentRoom()->LeaveRoom(_currPlayer);
 	
 	wcout << "DisConnect :" << cause << endl;
 }
@@ -110,8 +111,7 @@ int Session::ProcessData(BYTE* buffer, int len)
 void Session::ProcessPacket(BYTE* buffer, int len)
 {
 	shared_ptr<Session> session = static_pointer_cast<Session>(shared_from_this());
-	PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
-
+	
 	PacketHandler::ProcessPacket(session, buffer, len);
 
 }
@@ -180,7 +180,6 @@ void Session::RegisterSend()
 	_sendEvent.Init();
 	_sendEvent.owner = shared_from_this();
 
-	
 	int writeSize = 0;
 	while (_sendQueue.empty() == false)
 	{
@@ -220,8 +219,7 @@ void Session::ProcessSend(int numOfBytes)
 {
 	_sendEvent.owner = nullptr;
 	_sendEvent.sendBuffers.clear();
-	// ZeroMemory(_sendBuffer, sizeof(_sendBuffer));
-	// cout << "Send " << numOfBytes << " Bytes" << endl;
+	
 
 	if (numOfBytes == 0)
 	{
